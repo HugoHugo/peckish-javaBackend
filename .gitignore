@@ -1,0 +1,7 @@
+*.class*
+.project*
+*/doc/*
+*.settings*
+node_modules/*
+.pgpass
+javaconfig.properties
