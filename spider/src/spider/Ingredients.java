@@ -4,15 +4,17 @@ import java.util.*;
 import java.lang.*;
 import java.io.*;
 
-public class Ingredient {
+public class Ingredients {
     public static int iidtracker;
 
     public int iid;
 
-    public String iname;
+    public List<String> ingredients = new ArrayList<String>();
+    //public String iname;
 
-    public Ingredient() {
+    public Ingredients() {
 	this.iid = this.iidtracker;
 	this.iidtracker++;
+
     }
 }

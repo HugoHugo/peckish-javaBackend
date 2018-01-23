@@ -178,12 +178,13 @@ public class Spider {
 	keyphrase2 = "</span>";
 	beginhere = 0;
 	while (html.indexOf(keyphrase, beginhere) != -1) {
-	    Ingredient ing = new Ingredient();
+	    //Ingredient ing = new Ingredient();
 	    start = html.indexOf(keyphrase, beginhere);
 	    start = start + keyphrase.length();
 	    end = html.indexOf(keyphrase2, start);
-	    ing.iname = html.substring(start,end);
-	    yummy.inglist.add(ing);
+	    yummy.ingredients.ingredients.add(html.substring(start,end));
+	    //ing.iname = html.substring(start,end);
+	    //yummy.inglist.add(ing);
 	    beginhere = end;
 	}
 	
@@ -229,15 +230,14 @@ public class Spider {
 	String potentialURL = null;
 	for (int i = 0; i < weblinks.size(); i++) {
 	    potentialURL = weblinks.get(i);
-	    if (helper.isImage(potentialURL)) {
-		keyphrase = baseurl + "photos/";
-		if (potentialURL.indexOf(keyphrase) != -1)
-		    yummy.imageurl = potentialURL;
+	    keyphrase = baseurl + "photos/";
+	    if (helper.isImage(potentialURL) && potentialURL.indexOf(keyphrase) != -1) {
+		yummy.imageurl = potentialURL;
+		yummy.imageurl = "Inside the if statement";
+		break;
 	    }
-	} 
+	}
 	recipecounter++;
-	System.out.println("Added recipe: ");
-	System.out.println(yummy.rid + "\t" + yummy.rname + "\t" + yummy.rating);
 	return yummy;
     }
 

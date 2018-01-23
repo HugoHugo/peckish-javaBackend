@@ -9,7 +9,8 @@ public class Recipe {
 
     public int rid;
     
-    public List<Ingredient> inglist = new ArrayList<Ingredient>();
+    public Ingredients ingredients = new Ingredients();
+    //public List<Ingredient> inglist = new ArrayList<Ingredient>();
 
     public double rating;
 
