@@ -97,8 +97,8 @@ public class Message {
 			System.out.println("Done parsing JSON!");
 			if(requestContent.get("type").getAsString().equals("ingredients")){
 				Ingredients myIn = new Ingredients();
-				myIn.ingredients = gson.fromJson(requestContent.get("ingredients"), List.class);
-				System.out.println(myIn.ingredients.get(0));	
+				myIn.ingredientnames = gson.fromJson(requestContent.get("ingredients"), List.class);
+				System.out.println(myIn.ingredientnames.get(0));	
 			}
 		}
 		else{
