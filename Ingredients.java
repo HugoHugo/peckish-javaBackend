@@ -1,5 +1,3 @@
-package spider;
-
 import java.util.*;
 import java.lang.*;
 import java.io.*;
@@ -17,4 +15,3 @@ public class Ingredients {
 	this.iidtracker++;
 
     }
-}
