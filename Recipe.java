@@ -5,8 +5,6 @@ import java.lang.*;
 import java.io.*;
 
 public class Recipe {
-    public static int ridtracker = 1;
-
     public int rid;
     
     public Ingredients ingredients = new Ingredients();
@@ -19,9 +17,4 @@ public class Recipe {
     public String rname;
 
     public String imageurl;
-
-    public Recipe() {
-	this.rid = this.ridtracker;
-	this.ridtracker += 1;
-    }
 }

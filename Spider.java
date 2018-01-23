@@ -155,6 +155,10 @@ public class Spider {
     List<String> getFinished() { return finished; }
 
 
+
+
+
+    
     /** Create a new Recipe object and add info to it */
     public Recipe recipewriter (String url, String html) {
 	Recipe yummy = new Recipe();
