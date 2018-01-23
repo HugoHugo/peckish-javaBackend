@@ -92,8 +92,6 @@ public class Message {
 			System.out.println(tmp);
 			content = tmp;
 			Gson gson = new GsonBuilder().setLenient().create();
-			//JsonParser jPars = new JsonParser();
-			//JsonElement jEl = jPars.parse(tmp);
 			requestContent = new JsonParser().parse(content).getAsJsonObject();
 			System.out.println("Done parsing JSON!");
 			if(requestContent.get("type").getAsString().equals("ingredients")){
@@ -101,16 +99,6 @@ public class Message {
 				myIn.ingredients = gson.fromJson(requestContent.get("ingredients"), String[].class);
 				System.out.println(myIn.ingredients[0]);	
 			}
-			//for(int i=1; i<100; i++){
-			//	if(requestContent.get(String.valueOf(i)).getClass() == JsonElement.class){
-			//		System.out.println("##########################################");
-			//	}
-			//	String tmpStr = requestContent.get(String.valueOf(i));
-			//	JsonObject tmpJsonObj = requestContent.get(String.valueOf(i)).getAsJsonObject();
-			//	if(tmpJsonObj==null)
-			//		break;
-			//	System.out.println(tmpJsonObj.get("hidden"));
-			//}
 		}
 		else{
 			type="LINE";
