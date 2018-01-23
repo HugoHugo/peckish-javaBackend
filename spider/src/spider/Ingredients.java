@@ -9,7 +9,7 @@ public class Ingredients {
 
     public int iid;
 
-    public List<String> ingredients = new ArrayList<String>();
+    public List<String> ingredientnames = new ArrayList<String>();
     //public String iname;
 
     public Ingredients() {

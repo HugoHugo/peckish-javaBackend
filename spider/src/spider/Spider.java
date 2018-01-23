@@ -182,7 +182,7 @@ public class Spider {
 	    start = html.indexOf(keyphrase, beginhere);
 	    start = start + keyphrase.length();
 	    end = html.indexOf(keyphrase2, start);
-	    yummy.ingredients.ingredients.add(html.substring(start,end));
+	    yummy.ingredients.ingredientnames.add(html.substring(start,end));
 	    //ing.iname = html.substring(start,end);
 	    //yummy.inglist.add(ing);
 	    beginhere = end;
