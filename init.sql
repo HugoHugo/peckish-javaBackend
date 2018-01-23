@@ -18,6 +18,7 @@ CREATE TABLE ingredients(
 CREATE TABLE IinR(
 	R_id int references recipes(R_id),
 	I_id int references ingredients(I_id),
+	amount text DEFAULT 'a pinch',
 	unique(R_id, I_id)
 );
 
