@@ -90,8 +90,9 @@ public class Spider {
 		    processPage(work.peek());
 		    finished.add(work.poll());
 		}
-		else
+		else {
 		    break;
+		}
 	    }
 	}
 		
@@ -192,7 +193,14 @@ public class Spider {
 	start = html.indexOf(keyphrase);
 	start = start + keyphrase.length();
 	end = html.indexOf(keyphrase2, start);
-	yummy.rating = Double.parseDouble(html.substring(start,end));
+	String ratingstring = html.substring(start,end);
+
+	keyphrase = ".";
+	start = ratingstring.indexOf(keyphrase);
+	start = start - 1;
+	end = start + 4;
+	//Rating isn't rounded but who cares
+	yummy.rating = Double.parseDouble(ratingstring.substring(start,end));
 	
 	/* Adding to step list */
 	// keyphrase = "<span class=\"recipe-directions__list--item\">";
@@ -213,6 +221,7 @@ public class Spider {
 	start = html.indexOf(keyphrase);
 	start = start + keyphrase.length();
 	end = html.indexOf(keyphrase2, start);
+	html.substring(start,end).replace("&#39;","'");
 	yummy.rname = html.substring(start,end);
 	
 	/* Finding a picture */
@@ -227,7 +236,8 @@ public class Spider {
 	    }
 	} 
 	recipecounter++;
-	System.out.println("Added recipe: " + yummy.rname);
+	System.out.println("Added recipe: ");
+	System.out.println(yummy.rid + "\t" + yummy.rname + "\t" + yummy.rating);
 	return yummy;
     }
 
@@ -240,5 +250,30 @@ public class Spider {
 	recipeno = myurl.substring(helpstart,endstart);
 	return recipeno;
     }
-}
 
+    public void filewriter() throws IOException{
+	File to_file = new File("cookbook.txt");
+	FileOutputStream to = null;
+	try {
+	    to = new FileOutputStream(to_file);
+	    for (int i = 0; i < recipelist.size(); i++) {
+		Recipe rec = recipelist.get(i);
+		
+		String myrid = Integer.toString(rec.rid);
+		byte[] bytes = myrid.getBytes();
+		to.write(bytes);
+		
+		bytes = rec.rname.getBytes();
+		to.write(bytes);
+		
+		String myrating = Double.toString(rec.rating);
+		bytes = myrating.getBytes();
+		to.write(bytes);
+		}
+	}
+	finally {
+	    if (to != null) try {to.close();} catch (IOException em) {System.out.println(em.getMessage());}
+	}
+    }
+
+}
