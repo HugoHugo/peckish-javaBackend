@@ -1,6 +1,7 @@
 import java.io.*;
 import java.util.StringTokenizer;
 import com.google.gson.*;
+import java.util.*;
 
 /**
  * @author valent1
@@ -96,8 +97,8 @@ public class Message {
 			System.out.println("Done parsing JSON!");
 			if(requestContent.get("type").getAsString().equals("ingredients")){
 				Ingredients myIn = new Ingredients();
-				myIn.ingredients = gson.fromJson(requestContent.get("ingredients"), String[].class);
-				System.out.println(myIn.ingredients[0]);	
+				myIn.ingredients = gson.fromJson(requestContent.get("ingredients"), List.class);
+				System.out.println(myIn.ingredients.get(0));	
 			}
 		}
 		else{

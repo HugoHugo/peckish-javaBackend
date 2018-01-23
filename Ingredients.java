@@ -1,5 +1,6 @@
 import java.io.*;
+import java.util.*;
 
 public class Ingredients {
-	public String[] ingredients;
+	public List<String> ingredients;
 }
