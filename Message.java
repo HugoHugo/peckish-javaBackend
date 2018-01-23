@@ -88,7 +88,7 @@ public class Message {
 		else if (sInputBuff.regionMatches(0,"POST",0,4)){
 			type="LINE";
 			System.out.println("POST Receiver Received " + countOfBytes + " bytes.");
-			String tmp = sInputBuff.substring(getJSONContentFromByte(inputBuff), inputBuff.length);
+			String tmp = sInputBuff.substring(getJSONContentFromByte(inputBuff), getEndOfJSONFromByte(inputBuff, getJSONContentFromByte(inputBuff)));
 			System.out.println(tmp);
 			content = tmp;
 			Gson gson = new GsonBuilder().setLenient().create();
@@ -96,6 +96,21 @@ public class Message {
 			//JsonElement jEl = jPars.parse(tmp);
 			requestContent = new JsonParser().parse(content).getAsJsonObject();
 			System.out.println("Done parsing JSON!");
+			if(requestContent.get("type").getAsString().equals("ingredients")){
+				Ingredients myIn = new Ingredients();
+				myIn.ingredients = gson.fromJson(requestContent.get("ingredients"), String[].class);
+				System.out.println(myIn.ingredients[0]);	
+			}
+			//for(int i=1; i<100; i++){
+			//	if(requestContent.get(String.valueOf(i)).getClass() == JsonElement.class){
+			//		System.out.println("##########################################");
+			//	}
+			//	String tmpStr = requestContent.get(String.valueOf(i));
+			//	JsonObject tmpJsonObj = requestContent.get(String.valueOf(i)).getAsJsonObject();
+			//	if(tmpJsonObj==null)
+			//		break;
+			//	System.out.println(tmpJsonObj.get("hidden"));
+			//}
 		}
 		else{
 			type="LINE";
@@ -139,6 +154,16 @@ public class Message {
 			}
 		}
 		return -1;
+	}
+	public int getEndOfJSONFromByte(byte[] userB, int jsonBegins){
+		int rVal=-1;
+		for(int i=jsonBegins; i<userB.length; ++i){
+			if(userB[i] == 125){
+				rVal = i; //Finds the last occurence of right closing brace and returns it
+			}
+		}
+		++rVal;
+		return rVal;
 	}
 	public int getJSONContentFromByte(byte[] userB){
 		for(int i=0; i<userB.length; ++i){
