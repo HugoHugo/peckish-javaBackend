@@ -1,5 +1,7 @@
 import java.io.*;
 import java.util.StringTokenizer;
+import com.google.gson.*;
+import java.util.*;
 
 /**
  * @author valent1
@@ -14,6 +16,8 @@ public class Message {
 	public String type;
 
 	public String content;
+
+	public JsonObject requestContent;
 
 	/**
 	* Default constructor for Message class
@@ -73,6 +77,30 @@ public class Message {
 				System.out.println(contentTokenized.nextToken());
 			}
 		}
+		else if (sInputBuff.regionMatches(0,"GET",0,3)){
+			type="LINE";
+			System.out.println("GET Receiver Received " + countOfBytes + " bytes.");
+			content = toString(inputBuff);
+			StringTokenizer contentTokenized = new StringTokenizer(content, TERMINATOR);
+			while(contentTokenized.hasMoreTokens()){
+				System.out.println(contentTokenized.nextToken());
+			}
+		}
+		else if (sInputBuff.regionMatches(0,"POST",0,4)){
+			type="LINE";
+			System.out.println("POST Receiver Received " + countOfBytes + " bytes.");
+			String tmp = sInputBuff.substring(getJSONContentFromByte(inputBuff), getEndOfJSONFromByte(inputBuff, getJSONContentFromByte(inputBuff)));
+			System.out.println(tmp);
+			content = tmp;
+			Gson gson = new GsonBuilder().setLenient().create();
+			requestContent = new JsonParser().parse(content).getAsJsonObject();
+			System.out.println("Done parsing JSON!");
+			if(requestContent.get("type").getAsString().equals("ingredients")){
+				Ingredients myIn = new Ingredients();
+				myIn.ingredients = gson.fromJson(requestContent.get("ingredients"), List.class);
+				System.out.println(myIn.ingredients.get(0));	
+			}
+		}
 		else{
 			type="LINE";
 			System.out.println("Default Receiver Received " + countOfBytes + " bytes.");
@@ -112,6 +140,24 @@ public class Message {
 		for(int i=0; i<userB.length; ++i){
 			if(userB[i] == 10){
 				return i;
+			}
+		}
+		return -1;
+	}
+	public int getEndOfJSONFromByte(byte[] userB, int jsonBegins){
+		int rVal=-1;
+		for(int i=jsonBegins; i<userB.length; ++i){
+			if(userB[i] == 125){
+				rVal = i; //Finds the last occurence of right closing brace and returns it
+			}
+		}
+		++rVal;
+		return rVal;
+	}
+	public int getJSONContentFromByte(byte[] userB){
+		for(int i=0; i<userB.length; ++i){
+			if(userB[i] == 13 && userB[i-1] == 10 && userB[i+1] == 10){ //find where JSON begins after header
+				return i+2;
 			}
 		}
 		return -1;
