@@ -5,7 +5,7 @@
 .java.class:
 	javac $*.java
 
-default: Backend.class Sender.class Worker.class ManipulateDatabase.class Message.class Ingredients.class
+default: Backend.class Sender.class Worker.class ManipulateDatabase.class Message.class Ingredients.class Librarian.class
 
 javadoc:
 	cd doc; javadoc -author -package *.java
