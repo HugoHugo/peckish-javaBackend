@@ -7,7 +7,8 @@ CREATE TABLE recipes(
 	numIngredients int,
 	difficulty int,
 	rating int,
-	source text
+	source text DEFAULT 'Yours truly',
+	imageURL text DEFAULT 'https://cdn.pixabay.com/photo/2013/11/24/10/40/dessert-216870_960_720.jpg'
 );
 
 CREATE TABLE ingredients(

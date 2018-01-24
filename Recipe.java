@@ -8,7 +8,7 @@ public class Recipe {
     public Ingredients ingredients = new Ingredients();
     //public List<Ingredient> inglist = new ArrayList<Ingredient>();
 
-    public double rating;
+    public double rating=-1;
 
     public List<String> steps = new ArrayList<String>();
 
@@ -21,10 +21,12 @@ public class Recipe {
     //Number of ingredients missing. Only used if creating a JSON to be returned to the user
     public int NoIngMiss; //missing  in react native JSON
 
-    public Recipe(int initRid, String initRname, Ingredients initingredients, int initmissing){
+    public Recipe(int initRid, String initRname, Ingredients initingredients, int initmissing, String initsource, String initimageurl){
     	rid = initRid;
     	rname = initRname;
     	ingredients = initingredients;
     	NoIngMiss = initmissing;
+        source = initsource;
+        imageurl = initimageurl;
     }
 }
