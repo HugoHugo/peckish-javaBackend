@@ -1,3 +1,6 @@
+DROP TABLE IinR;
+DROP TABLE recipes;
+DROP TABLE ingredients;
 
 CREATE TABLE recipes(
 	R_id int primary key,
@@ -25,7 +28,7 @@ CREATE TABLE IinR(
 
 
 INSERT INTO ingredients VALUES (1, 'Spaghetti');
-INSERT INTO ingredients VALUES (2, 'Macaroni');
+INSERT INTO ingredients VALUES (2, 'elbow macaroni');
 INSERT INTO ingredients VALUES (3, 'Cheese');
 INSERT INTO ingredients VALUES (4, 'Marinara Sauce');
 INSERT INTO ingredients VALUES (5, 'POTATOES');

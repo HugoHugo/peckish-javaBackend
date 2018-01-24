@@ -19,7 +19,9 @@ public class Recipe {
     public String source;//source in react native JSON
 
     //Number of ingredients missing. Only used if creating a JSON to be returned to the user
-    public int NoIngMiss; //missing  in react native JSON
+    public int NoIngMiss; //missing  in react native JS
+    public Recipe(){
+    }
 
     public Recipe(int initRid, String initRname, Ingredients initingredients, int initmissing, String initsource, String initimageurl){
     	rid = initRid;

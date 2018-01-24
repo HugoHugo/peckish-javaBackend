@@ -16,8 +16,8 @@ public class Librarian{
 	/** The variable referencing the open connection to the database */
 	private Connection con;
 	/** list of IDs already in use */
-	static private List<Integer> usedIIDs;
-	static private List<Integer> usedRIDs;
+	static private List<Integer> usedIIDs = new ArrayList<Integer>();
+	static private List<Integer> usedRIDs = new ArrayList<Integer>();
 
 	/** In case of parallelization*/
 	static private boolean stashing = false;
@@ -40,6 +40,20 @@ public class Librarian{
 		for(Recipe r : resReceps){
 			System.out.println(r.rname +" is missing " + r.NoIngMiss + " ingredients.");
 		}
+		System.out.println("\n About to test adding stuff to the database");
+		testIng = new Ingredients();
+		testIng.ingredientnames.add("salt");
+		testIng.ingredientnames.add("elbow macaroni");
+		testIng.ingredientnames.add("butter");
+		testIng.ingredientnames.add("cayenne pepper");
+		testIng.ingredientnames.add("sharp cheddar");
+		Recipe myR = new Recipe();
+		myR.rname = "Macaroni and Cheese";
+		myR.ingredients = testIng;
+		myR.imageurl = "../assets/images/macandcheese.jpg";
+		myR.source = "BudgetBytes";
+		enableStashing = true;
+		mylib.stashRecipe(myR);
 	}
 
 	/** Constructor that stores connection info and initializes the connection to the database */
@@ -52,6 +66,7 @@ public class Librarian{
 			Class.forName(driver);
 			con = DriverManager.getConnection(url, user, password);
 			System.out.println("Connected with no exceptions");
+			UpdateUsedIDs();
 		} catch (ClassNotFoundException e){
 			System.out.println("Error Connecting to Database:");
 			System.out.println(e.getMessage());
@@ -112,7 +127,7 @@ public class Librarian{
 	@param ingred the exact name of the ingredient in question
 	@return the appropriate Ingredient ID*/
 	public int getIngredientID(String ingred){
-		int myResult=-1;
+		int myResult = -1;
 		try{
 			String myCmd = "SELECT I_id, name FROM ingredients WHERE name = ?;";
 			PreparedStatement ps1 = con.prepareStatement(myCmd);
@@ -190,7 +205,7 @@ public class Librarian{
 			ResultSet rs = st.executeQuery("SELECT I_id FROM ingredients;");
 			while(rs.next()) usedIIDs.add(rs.getInt("I_id"));
 		} catch (SQLException e){
-			System.out.println(e.getMessage());
+			System.out.println("UpdateUsedIDs " + e.getMessage());
 		}
 	}
 
@@ -210,24 +225,28 @@ public class Librarian{
 		if(!enableStashing) return false;
 		stashIngredients(r.ingredients);
 		try{
-			PreparedStatement ps = con.prepareStatement("INSERT INTO recipes (R_id, name, source, imageURL) VALUES (?,?,?,?)");
+			PreparedStatement ps = con.prepareStatement("INSERT INTO recipes (R_id, name, source, imageURL, numIngredients) VALUES (?,?,?,?,?)");
 			if(getRecipeID(r.rname)==-1){
 				int temp = getUnusedRID();
+				System.out.println(temp);
 				ps.setInt(1, temp);
 				ps.setString(2,r.rname);
 				ps.setString(3,r.source);
 				ps.setString(4,r.imageurl);
+				ps.setInt(5, r.ingredients.ingredientIDs.size());
 				ps.executeUpdate();
 				usedRIDs.add(temp);
 				ps = con.prepareStatement("INSERT INTO IinR (R_id, I_id) VALUES (?,?)");
+				for(Integer i : r.ingredients.ingredientIDs) System.out.println(i);
 				for(Integer i : r.ingredients.ingredientIDs){
+					System.out.println(temp + " " + i);
 					ps.setInt(1, temp);
 					ps.setInt(2, i);
 					ps.executeUpdate();
 				}
 			}
 		} catch (SQLException e){
-			System.out.println(e.getMessage());
+			System.out.println("stashRecipe " + e.getMessage());
 			return false;
 		}
 		return true;
@@ -239,7 +258,7 @@ public class Librarian{
 		try{
 			PreparedStatement ps = con.prepareStatement("INSERT INTO ingredients (I_id, name) VALUES (?,?)");
 			for(int i = 0; i<ings.ingredientIDs.size(); i++){
-				if(ings.ingredientIDs.get(i)==-1){
+				if(ings.ingredientIDs.get(i) == -1){
 					int temp = getUnusedIID();
 					ps.setInt(1, temp);
 					ps.setString(2,ings.ingredientnames.get(i));
@@ -247,8 +266,9 @@ public class Librarian{
 					usedIIDs.add(temp);
 				}
 			}
+			fillIID(ings);
 		} catch (SQLException e){
-			System.out.println(e.getMessage());
+			System.out.println("stashIngredients " + e.getMessage());
 			return false;
 		}
 		return true;
