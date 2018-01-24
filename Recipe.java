@@ -15,4 +15,14 @@ public class Recipe {
     public String rname;
 
     public String imageurl;
+
+    //Number of ingredients missing. Only used if creating a JSON to be returned to the user
+    public int NoIngMiss;
+
+    public Recipe(int initRid, String initRname, Ingredients initingredients, int initmissing){
+    	rid = initRid;
+    	rname = initRname;
+    	ingredients = initingredients;
+    	NoIngMiss = initmissing;
+    }
 }
