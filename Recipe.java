@@ -6,20 +6,23 @@ public class Recipe {
     public int rid;//id in react native JSON
     
     public Ingredients ingredients = new Ingredients();
-    //public List<Ingredient> inglist = new ArrayList<Ingredient>();
 
     public double rating=-1;
 
-    public List<String> steps = new ArrayList<String>();
+    public String steps = "Directions: ";
 
     public String rname;//title in react native JSON
 
-    public String imageurl;//imagePath in react native JSON
+    public String imageurl;
 
-    public String source;//source in react native JSON
+    public String url;
 
-    //Number of ingredients missing. Only used if creating a JSON to be returned to the user
-    public int NoIngMiss; //missing  in react native JS
+    public String cooktime;
+
+    public String serving;
+
+    public int missing;
+
     public Recipe(){
     }
 
@@ -27,8 +30,8 @@ public class Recipe {
     	rid = initRid;
     	rname = initRname;
     	ingredients = initingredients;
-    	NoIngMiss = initmissing;
-        source = initsource;
+    	missing = initmissing;
+        url = initsource;
         imageurl = initimageurl;
     }
 }

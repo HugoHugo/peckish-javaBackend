@@ -4,13 +4,13 @@ DROP TABLE ingredients;
 
 CREATE TABLE recipes(
 	R_id int primary key,
-	name text,
-	description text,
+	rname text,
 	steps text,
 	numIngredients int,
-	difficulty int,
-	rating int,
-	source text DEFAULT 'Yours truly',
+	rating double precision,
+	cooktime text,
+	serving text,
+	url text DEFAULT 'https://wp.stolaf.edu/',
 	imageURL text DEFAULT 'https://cdn.pixabay.com/photo/2013/11/24/10/40/dessert-216870_960_720.jpg'
 );
 
@@ -34,19 +34,19 @@ INSERT INTO ingredients VALUES (4, 'Marinara Sauce');
 INSERT INTO ingredients VALUES (5, 'POTATOES');
 INSERT INTO ingredients VALUES (6, 'Bell Peppers');
 
-INSERT INTO recipes (R_id, name, numIngredients) VALUES (1, 'Mac-n-Cheese', 2);
+INSERT INTO recipes (R_id, rname, numIngredients) VALUES (1, 'Mac-n-Cheese', 2);
 INSERT INTO IinR VALUES (1,2);
 INSERT INTO IinR VALUES (1,3);
 
-INSERT INTO recipes (R_id, name, numIngredients) VALUES (2, 'Student Pasta', 2);
+INSERT INTO recipes (R_id, rname, numIngredients) VALUES (2, 'Student Pasta', 2);
 INSERT INTO IinR VALUES (2,1);
 INSERT INTO IinR VALUES (2,4);
 
-INSERT INTO recipes (R_id, name, numIngredients) VALUES (3, 'WTF Student Pasta', 4);
+INSERT INTO recipes (R_id, rname, numIngredients) VALUES (3, 'WTF Student Pasta', 4);
 INSERT INTO IinR VALUES (3,1);
 INSERT INTO IinR VALUES (3,4);
 INSERT INTO IinR VALUES (3,5);
 INSERT INTO IinR VALUES (3,6);
 
-INSERT INTO recipes (R_id, name, numIngredients) VALUES (4, 'Stuff Andreas doesnt like', 1);
+INSERT INTO recipes (R_id, rname, numIngredients) VALUES (4, 'Stuff Andreas doesnt like', 1);
 INSERT INTO IinR VALUES (4,5);
