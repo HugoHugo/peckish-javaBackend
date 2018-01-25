@@ -20,7 +20,11 @@ public class Worker implements Runnable {
       while(true){
         Message m = new Message(inStream);
         if(m.type.equals("getFile")){
+	  inStream.close();
           getFile(m);
+        }
+        if(m.type.equals("GET")){
+          handleGET(m);
         }
         Message m2 = new Message("ACK","");
         m2.send(outStream);
@@ -33,6 +37,16 @@ public class Worker implements Runnable {
     }catch (IOException e) {
       System.out.println(e.getMessage());
     }
+  }
+
+  public void handleGET(Message m){	
+	try{
+		DataOutputStream outStream = new DataOutputStream(sock.getOutputStream());
+		Message m3 = new Message("GET","");
+		m3.sendData(outStream);
+	} catch(IOException e){
+		System.out.println(e.getMessage());
+	}
   }
 
   public void getFile(Message m){
