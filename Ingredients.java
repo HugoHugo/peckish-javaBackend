@@ -8,6 +8,8 @@ public class Ingredients {
 
     public List<String> ingredientnames = new ArrayList<String>();
 
+    public List<String> amounts = new ArrayList<String>();
+
     public List<Integer> ingredientIDs = new ArrayList<Integer>();
-    //public String iname;
+
 }
