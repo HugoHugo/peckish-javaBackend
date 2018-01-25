@@ -17,6 +17,7 @@ public class RunSpider {
    * Run the spider program.
    * @param args Command-line arguments (unused).
    */
+
   public static void main(String [] args) {
     Spider spider = new Spider(Integer.parseInt(args[0]));
     spider.crawl(BEGINNING_URL);
