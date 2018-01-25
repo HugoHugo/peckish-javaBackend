@@ -27,12 +27,12 @@ CREATE TABLE IinR(
 );
 
 
-INSERT INTO ingredients VALUES (1, 'Spaghetti');
+INSERT INTO ingredients VALUES (1, 'spaghetti');
 INSERT INTO ingredients VALUES (2, 'elbow macaroni');
-INSERT INTO ingredients VALUES (3, 'Cheese');
-INSERT INTO ingredients VALUES (4, 'Marinara Sauce');
-INSERT INTO ingredients VALUES (5, 'POTATOES');
-INSERT INTO ingredients VALUES (6, 'Bell Peppers');
+INSERT INTO ingredients VALUES (3, 'cheese');
+INSERT INTO ingredients VALUES (4, 'marinara sauce');
+INSERT INTO ingredients VALUES (5, 'potatoes');
+INSERT INTO ingredients VALUES (6, 'bell peppers');
 
 INSERT INTO recipes (R_id, rname, numIngredients) VALUES (1, 'Mac-n-Cheese', 2);
 INSERT INTO IinR VALUES (1,2);

@@ -31,7 +31,7 @@ public class Librarian{
 			st.executeUpdate("set search_path to belezn1;");
 		}catch(SQLException e){;}
 		mylib.UpdateUsedIDs();
-		int testIngint = mylib.getIngredientID("Cheese");
+		int testIngint = mylib.getIngredientID("cheese");
 		String testIngString = mylib.getIngredientName(3);
 		System.out.println("Cheese has ID: " +testIngint);
 		System.out.println("The ingredient with ID 3 is " +testIngString);
@@ -139,6 +139,29 @@ public class Librarian{
 		return myResults;
 	}
 
+	public Recipe getRecipe(int Rid){
+		Recipe tempr = new Recipe();
+		try{
+			String myCmd = "SELECT * FROM recipes WHERE R_id = ?;";
+			PreparedStatement ps1 = con.prepareStatement(myCmd);
+			ps1.setInt(1, Rid);
+			ResultSet rs = ps1.executeQuery();
+			rs.next();
+			tempr.rid = rs.getInt("R_id");
+			tempr.ingredients =getIngredientsinRecipe(rs.getInt("R_id"));
+			tempr.rating = rs.getDouble("rating");
+			tempr.steps = rs.getString("steps");
+			tempr.rname = rs.getString("rname");
+			tempr.imageurl = rs.getString("imageURL");
+			tempr.url = rs.getString("url");
+			tempr.cooktime = rs.getString("cooktime");
+			tempr.serving = rs.getString("serving");
+		} catch (SQLException e){
+			System.out.println(e.getMessage());
+		}
+		return tempr;
+	}
+
 	/** A helper function that finds the ID of a recipe
 	@param title the exact name of the recipe in question
 	@return Rid*/
@@ -165,7 +188,7 @@ public class Librarian{
 		try{
 			String myCmd = "SELECT I_id, name FROM ingredients WHERE name = ?;";
 			PreparedStatement ps1 = con.prepareStatement(myCmd);
-			ps1.setString(1, ingred);
+			ps1.setString(1, ingred.toLowerCase());
 			ResultSet rs = ps1.executeQuery();
 			rs.next();
 			myResult = rs.getInt("I_id");
@@ -272,7 +295,7 @@ public class Librarian{
 				int temp = getUnusedRID();
 				System.out.println(temp);
 				ps.setInt(1, temp);
-				ps.setString(2,r.rname);
+				ps.setString(2,r.rname.toLowerCase());
 				ps.setString(3,r.url);
 				ps.setString(4,r.imageurl);
 				ps.setInt(5, r.ingredients.ingredientIDs.size());
