@@ -19,6 +19,10 @@ public class Message {
 
 	public JsonObject requestContent;
 
+	public Ingredients myIngredients;
+
+	public List<Recipe> myRecipes;
+
 	/**
 	* Default constructor for Message class
 	*/
@@ -87,7 +91,7 @@ public class Message {
 			}
 		}
 		else if (sInputBuff.regionMatches(0,"POST",0,4)){
-			type="LINE";
+			type="recipeSearch";
 			System.out.println("POST Receiver Received " + countOfBytes + " bytes.");
 			String tmp = sInputBuff.substring(getJSONContentFromByte(inputBuff), getEndOfJSONFromByte(inputBuff, getJSONContentFromByte(inputBuff)));
 			System.out.println(tmp);
@@ -96,8 +100,8 @@ public class Message {
 			requestContent = new JsonParser().parse(content).getAsJsonObject();
 			System.out.println("Done parsing JSON!");
 			if(requestContent.get("type").getAsString().equals("ingredients")){
-				Ingredients myIn = new Ingredients();
-				myIn.ingredientnames = gson.fromJson(requestContent.get("ingredients"), List.class);
+				myIngredients = new Ingredients();
+				myIngredients.ingredientnames = gson.fromJson(requestContent.get("ingredients"), List.class);
 				System.out.println(myIn.ingredientnames.get(0));	
 			}
 		}
