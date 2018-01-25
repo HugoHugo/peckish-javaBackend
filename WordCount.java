@@ -1,5 +1,3 @@
-package spider;
-
 /**
  * Counts the number of times a word has occured.
  * @author shilad

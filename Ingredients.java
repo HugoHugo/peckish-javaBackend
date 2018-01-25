@@ -7,5 +7,7 @@ public class Ingredients {
     public int iid;
 
     public List<String> ingredientnames = new ArrayList<String>();
-    //public String iname;
+
+    public List<String> amounts = new ArrayList<String>();
+    
 }

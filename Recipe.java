@@ -6,13 +6,18 @@ public class Recipe {
     public int rid;
     
     public Ingredients ingredients = new Ingredients();
-    //public List<Ingredient> inglist = new ArrayList<Ingredient>();
 
     public double rating;
 
-    public List<String> steps = new ArrayList<String>();
+    public String steps = "Directions: ";
 
     public String rname;
 
     public String imageurl;
+
+    public String url;
+
+    public String cooktime;
+
+    public String serving;
 }

@@ -1,6 +1,3 @@
-package spider;
-
-
 /**
  * Downloads web pages by following http links located
  * in the html of BEGINNING_URL.  Recursively repeats

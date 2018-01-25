@@ -1,5 +1,3 @@
-package spider;
-
 import java.util.Arrays;
 
 
