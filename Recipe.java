@@ -31,7 +31,7 @@ public class Recipe {
     	rname = initRname;
     	ingredients = initingredients;
     	NoIngMiss = initmissing;
-        source = initsource;
+        url = initsource;
         imageurl = initimageurl;
     }
 }
