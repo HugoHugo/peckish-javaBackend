@@ -23,18 +23,14 @@ public class Worker implements Runnable {
       OutputStream outStream = sock.getOutputStream();
       while(true){
         Message m = new Message(inStream);
-        if(m.type.equals("recipeSearch")){
-          List<Recipe> r = mylib.searchPotentialRecipes(m.myIngredients);
-          Message m2 = new Message("ACK","");
-          m2.myRecipes = r;
-          m2.send(outStream);
-        } else {
           if(m.type.equals("getFile")){
             getFile(m);
           }
+          if(m.type.equals("GET")){
+            handleGET(m);
+          }
           Message m2 = new Message("ACK","");
           m2.send(outStream);
-        }
         String endm = "END";
         if(m.content.regionMatches(0,endm,0,3) || m.content.regionMatches(0,"EOT",0,3)){
           sock.close();
@@ -44,6 +40,16 @@ public class Worker implements Runnable {
     }catch (IOException e) {
       System.out.println(e.getMessage());
     }
+  }
+
+  public void handleGET(Message m){	
+	try{
+		DataOutputStream outStream = new DataOutputStream(sock.getOutputStream());
+		Message m3 = new Message("GET","");
+		m3.sendData(outStream);
+	} catch(IOException e){
+		System.out.println(e.getMessage());
+	}
   }
 
   public void getFile(Message m){

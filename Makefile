@@ -16,3 +16,6 @@ javadoc-local:
 	cp Worker.java doc/Worker.java
 	cp Sender.java doc/Sender.java
 	cd doc; javadoc -author -package *.java
+
+setup:
+	wget http://repo1.maven.org/maven2/com/squareup/okhttp3/okhttp/3.9.1/okhttp-3.9.1.jar
