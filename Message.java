@@ -91,7 +91,7 @@ public class Message {
 			}
 		}
 		else if (sInputBuff.regionMatches(0,"POST",0,4)){
-			type="recipeSearch";
+			type="POST";
 			System.out.println("POST Receiver Received " + countOfBytes + " bytes.");
 			String tmp = sInputBuff.substring(getJSONContentFromByte(inputBuff), getEndOfJSONFromByte(inputBuff, getJSONContentFromByte(inputBuff)));
 			System.out.println(tmp);
@@ -102,7 +102,7 @@ public class Message {
 			if(requestContent.get("type").getAsString().equals("ingredients")){
 				myIngredients = new Ingredients();
 				myIngredients.ingredientnames = gson.fromJson(requestContent.get("ingredients"), List.class);
-				System.out.println(myIn.ingredientnames.get(0));	
+				System.out.println(myIngredients.ingredientnames.get(0));	
 			}
 		}
 		else{
@@ -241,9 +241,9 @@ public class Message {
 			content = gson.toJson("GetData={hello: yeah}");
 			//byte [] bcon = getBytes(content);
 			//int bconSize = bcon.length;
-			Ingredient testIn = new Ingredient(2,"pasta");
+			//Ingredient testIn = new Ingredient(2,"pasta");
 			str.writeBytes("HTTP/1.1 200 OK\nX-Powered-By: Express\nContent-Type: application/json; charset=utf-8\nConnection: close\n\n");
-			str.writeBytes(gson.toJson(testIn));
+			str.writeBytes(gson.toJson(myRecipes));
 			str.flush();
 			str.close();
 		}
