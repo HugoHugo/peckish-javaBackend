@@ -1,3 +1,7 @@
+import java.io.*;
+import java.util.*;
+import java.lang.*;
+
 /**
  * Downloads web pages by following http links located
  * in the html of BEGINNING_URL.  Recursively repeats
@@ -14,11 +18,8 @@ public class RunSpider {
    * @param args Command-line arguments (unused).
    */
   public static void main(String [] args) {
-    Spider spider = new Spider(5);
+      Spider spider = new Spider(Integer.parseInt(args[0]));
     spider.crawl(BEGINNING_URL);
-    //for (WordCount urlCount : spider.getUrlCounts()) {
-    //System.out.println("url " + urlCount.getWord() + " is " + 
-    //urlCount.getCount());
-    //}
+    List<Recipe> recipelist = spider.recipelist;
   }
 }
