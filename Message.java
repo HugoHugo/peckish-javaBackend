@@ -19,6 +19,10 @@ public class Message {
 
 	public JsonObject requestContent;
 
+	public Ingredients myIngredients;
+
+	public List<Recipe> myRecipes;
+
 	/**
 	* Default constructor for Message class
 	*/
@@ -78,7 +82,7 @@ public class Message {
 			}
 		}
 		else if (sInputBuff.regionMatches(0,"GET",0,3)){
-			type="LINE";
+			type="GET";
 			System.out.println("GET Receiver Received " + countOfBytes + " bytes.");
 			content = toString(inputBuff);
 			StringTokenizer contentTokenized = new StringTokenizer(content, TERMINATOR);
@@ -87,7 +91,7 @@ public class Message {
 			}
 		}
 		else if (sInputBuff.regionMatches(0,"POST",0,4)){
-			type="LINE";
+			type="recipeSearch";
 			System.out.println("POST Receiver Received " + countOfBytes + " bytes.");
 			String tmp = sInputBuff.substring(getJSONContentFromByte(inputBuff), getEndOfJSONFromByte(inputBuff, getJSONContentFromByte(inputBuff)));
 			System.out.println(tmp);
@@ -96,8 +100,8 @@ public class Message {
 			requestContent = new JsonParser().parse(content).getAsJsonObject();
 			System.out.println("Done parsing JSON!");
 			if(requestContent.get("type").getAsString().equals("ingredients")){
-				Ingredients myIn = new Ingredients();
-				myIn.ingredientnames = gson.fromJson(requestContent.get("ingredients"), List.class);
+				myIngredients = new Ingredients();
+				myIngredients.ingredientnames = gson.fromJson(requestContent.get("ingredients"), List.class);
 				System.out.println(myIn.ingredientnames.get(0));	
 			}
 		}
@@ -228,6 +232,20 @@ public class Message {
 				System.out.println("No type given. Exiting...");
 				System.exit(1);
 			}
+		}
+	}
+	
+	public void sendData(DataOutputStream str) throws IOException {
+		if (type == "GET"){
+			Gson gson = new GsonBuilder().setLenient().create();
+			content = gson.toJson("GetData={hello: yeah}");
+			//byte [] bcon = getBytes(content);
+			//int bconSize = bcon.length;
+			Ingredient testIn = new Ingredient(2,"pasta");
+			str.writeBytes("HTTP/1.1 200 OK\nX-Powered-By: Express\nContent-Type: application/json; charset=utf-8\nConnection: close\n\n");
+			str.writeBytes(gson.toJson(testIn));
+			str.flush();
+			str.close();
 		}
 	}
 

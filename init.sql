@@ -1,3 +1,6 @@
+DROP TABLE IinR;
+DROP TABLE recipes;
+DROP TABLE ingredients;
 
 CREATE TABLE recipes(
 	R_id int primary key,
@@ -7,7 +10,8 @@ CREATE TABLE recipes(
 	numIngredients int,
 	difficulty int,
 	rating int,
-	source text
+	source text DEFAULT 'Yours truly',
+	imageURL text DEFAULT 'https://cdn.pixabay.com/photo/2013/11/24/10/40/dessert-216870_960_720.jpg'
 );
 
 CREATE TABLE ingredients(
@@ -24,7 +28,7 @@ CREATE TABLE IinR(
 
 
 INSERT INTO ingredients VALUES (1, 'Spaghetti');
-INSERT INTO ingredients VALUES (2, 'Macaroni');
+INSERT INTO ingredients VALUES (2, 'elbow macaroni');
 INSERT INTO ingredients VALUES (3, 'Cheese');
 INSERT INTO ingredients VALUES (4, 'Marinara Sauce');
 INSERT INTO ingredients VALUES (5, 'POTATOES');
