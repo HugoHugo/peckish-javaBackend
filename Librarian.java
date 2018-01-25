@@ -28,7 +28,7 @@ public class Librarian{
 		Librarian mylib = new Librarian(bundle);
 		try{
 			Statement st = mylib.con.createStatement();
-			st.executeUpdate("set search_path to belezn1;");
+			st.executeUpdate("set search_path to valent1;");
 		}catch(SQLException e){;}
 		int testIngint = mylib.getIngredientID("Cheese");
 		String testIngString = mylib.getIngredientName(3);
@@ -57,11 +57,10 @@ public class Librarian{
 		myR.source = "BudgetBytes";
 		enableStashing = true;
 		mylib.stashRecipe(myR);
-		ingList = new ArrayList<Integer>();
-		ingList.add(1);ingList.add(28);ingList.add(27);
+		List<String> ingList2 = new ArrayList<String>();
+		ingList2.add("elbow macaroni");ingList2.add("Cheese");
 		testIng = new Ingredients();
-		testIng.ingredientIDs = ingList;
-		mylib.fillIname(testIng);
+		testIng.ingredientnames = ingList2;
 		resReceps = mylib.searchPotentialRecipes(testIng);
 		System.out.println("Recipes found: " + resReceps.size());
 		for(Recipe r : resReceps){
@@ -79,7 +78,7 @@ public class Librarian{
 			Class.forName(driver);
 			con = DriverManager.getConnection(url, user, password);
 			Statement st = con.createStatement();
-			st.executeUpdate("set search_path to mca_i18_pantry;");
+			st.executeUpdate("set search_path to valent1;");
 			System.out.println("Connected with no exceptions");
 			UpdateUsedIDs();
 		} catch (ClassNotFoundException e){
