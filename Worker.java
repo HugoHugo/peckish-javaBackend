@@ -1,14 +1,18 @@
 import java.io.*;
 import java.net.*;
+import java.util.*;
 
 public class Worker implements Runnable {
   Socket sock;
+  Librarian mylib;
   /**
   * Constructor to just fill in the fields
   * @param s Socket to connect to
   */
   public Worker (Socket s){
     sock = s;
+    ResourceBundle bundle = ResourceBundle.getBundle("javaconfig");
+    mylib = new Librarian(bundle);
   }
   /**
   * Method to run this thread of the worker. Reads in from the InputStream
@@ -19,11 +23,18 @@ public class Worker implements Runnable {
       OutputStream outStream = sock.getOutputStream();
       while(true){
         Message m = new Message(inStream);
-        if(m.type.equals("getFile")){
-          getFile(m);
+        if(m.type.equals("recipeSearch")){
+          List<Recipe> r = mylib.searchPotentialRecipes(m.myIngredients);
+          Message m2 = new Message("ACK","");
+          m2.myRecipes = r;
+          m2.send(outStream);
+        } else {
+          if(m.type.equals("getFile")){
+            getFile(m);
+          }
+          Message m2 = new Message("ACK","");
+          m2.send(outStream);
         }
-        Message m2 = new Message("ACK","");
-        m2.send(outStream);
         String endm = "END";
         if(m.content.regionMatches(0,endm,0,3) || m.content.regionMatches(0,"EOT",0,3)){
           sock.close();

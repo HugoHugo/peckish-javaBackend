@@ -14,18 +14,22 @@ public class Librarian{
 	/** The driver used to connect to the database */
 	private static String driver;
 	/** The variable referencing the open connection to the database */
-	private Connection con;
+	public Connection con;
 	/** list of IDs already in use */
 	static private List<Integer> usedIIDs = new ArrayList<Integer>();
 	static private List<Integer> usedRIDs = new ArrayList<Integer>();
 
 	/** In case of parallelization*/
 	static private boolean stashing = false;
-	static private boolean enableStashing = false;
+	static private boolean enableStashing = true;
 
 	public static void main(String[] args){
 		ResourceBundle bundle = ResourceBundle.getBundle("javaconfig");
 		Librarian mylib = new Librarian(bundle);
+		try{
+			Statement st = mylib.con.createStatement();
+			st.executeUpdate("set search_path to belezn1;");
+		}catch(SQLException e){;}
 		int testIngint = mylib.getIngredientID("Cheese");
 		String testIngString = mylib.getIngredientName(3);
 		System.out.println("Cheese has ID: " +testIngint);
@@ -50,10 +54,19 @@ public class Librarian{
 		Recipe myR = new Recipe();
 		myR.rname = "Macaroni and Cheese";
 		myR.ingredients = testIng;
-		myR.imageurl = "../assets/images/macandcheese.jpg";
 		myR.source = "BudgetBytes";
 		enableStashing = true;
 		mylib.stashRecipe(myR);
+		ingList = new ArrayList<Integer>();
+		ingList.add(1);ingList.add(28);ingList.add(27);
+		testIng = new Ingredients();
+		testIng.ingredientIDs = ingList;
+		mylib.fillIname(testIng);
+		resReceps = mylib.searchPotentialRecipes(testIng);
+		System.out.println("Recipes found: " + resReceps.size());
+		for(Recipe r : resReceps){
+			System.out.println(r.rname +" is missing " + r.NoIngMiss + " ingredients.");
+		}
 	}
 
 	/** Constructor that stores connection info and initializes the connection to the database */
@@ -65,6 +78,8 @@ public class Librarian{
 		try{
 			Class.forName(driver);
 			con = DriverManager.getConnection(url, user, password);
+			Statement st = con.createStatement();
+			st.executeUpdate("set search_path to mca_i18_pantry;");
 			System.out.println("Connected with no exceptions");
 			UpdateUsedIDs();
 		} catch (ClassNotFoundException e){
