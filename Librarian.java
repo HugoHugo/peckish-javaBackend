@@ -30,6 +30,7 @@ public class Librarian{
 			Statement st = mylib.con.createStatement();
 			st.executeUpdate("set search_path to belezn1;");
 		}catch(SQLException e){;}
+		mylib.UpdateUsedIDs();
 		int testIngint = mylib.getIngredientID("Cheese");
 		String testIngString = mylib.getIngredientName(3);
 		System.out.println("Cheese has ID: " +testIngint);
@@ -42,30 +43,37 @@ public class Librarian{
 		List<Recipe> resReceps = mylib.searchPotentialRecipes(testIng);
 		System.out.println("Recipes found: " + resReceps.size());
 		for(Recipe r : resReceps){
-			System.out.println(r.rname +" is missing " + r.NoIngMiss + " ingredients.");
+			System.out.println(r.rname +" is missing " + r.missing + " ingredients.");
 		}
 		System.out.println("\n About to test adding stuff to the database");
 		testIng = new Ingredients();
 		testIng.ingredientnames.add("salt");
+		testIng.amounts.add("1/2 tsp");
 		testIng.ingredientnames.add("elbow macaroni");
+		testIng.amounts.add("2 cups");
 		testIng.ingredientnames.add("butter");
+		testIng.amounts.add("2 Tbsp");
+		testIng.ingredientnames.add("dijon mustard");
+		testIng.amounts.add("1/2 tsps");
 		testIng.ingredientnames.add("cayenne pepper");
+		testIng.amounts.add("1 pinch");
 		testIng.ingredientnames.add("sharp cheddar");
+		testIng.amounts.add("1.5 cups shredded");
 		Recipe myR = new Recipe();
 		myR.rname = "Macaroni and Cheese";
 		myR.ingredients = testIng;
-		myR.source = "BudgetBytes";
+		myR.url = "BudgetBytes";
 		enableStashing = true;
 		mylib.stashRecipe(myR);
 		ingList = new ArrayList<Integer>();
-		ingList.add(1);ingList.add(28);ingList.add(27);
+		ingList.add(30);ingList.add(31);ingList.add(32);
 		testIng = new Ingredients();
 		testIng.ingredientIDs = ingList;
 		mylib.fillIname(testIng);
 		resReceps = mylib.searchPotentialRecipes(testIng);
 		System.out.println("Recipes found: " + resReceps.size());
 		for(Recipe r : resReceps){
-			System.out.println(r.rname +" is missing " + r.NoIngMiss + " ingredients.");
+			System.out.println(r.rname +" is missing " + r.missing + " ingredients.");
 		}
 	}
 
@@ -101,7 +109,7 @@ public class Librarian{
 			System.out.println("Starting search for ingredients");
 			//We make a command to look for the number of ingredients missing for each recipe, and select those that have less than 4 missing
 			Statement st = con.createStatement();
-			String myCommand = "SELECT sub.thing AS missing, sub.R_id, r.name, r.numIngredients, r.source, r.imageURL FROM (SELECT r.R_id, MAX(r.numIngredients) - COUNT(*) AS thing FROM IinR ir, recipes r WHERE r.R_id=ir.R_id AND ir.I_id in (";
+			String myCommand = "SELECT sub.thing AS missing, sub.R_id, r.rname, r.numIngredients, r.url, r.imageURL, r.rating, r.steps, r.cooktime, r.serving FROM (SELECT r.R_id, MAX(r.numIngredients) - COUNT(*) AS thing FROM IinR ir, recipes r WHERE r.R_id=ir.R_id AND ir.I_id in (";
 			myCommand = myCommand + ingredientlist.ingredientIDs.get(0);
 			for(int i=1;i<ingredientlist.ingredientIDs.size();i++){
 				myCommand = myCommand + "," + ingredientlist.ingredientIDs.get(i);
@@ -112,7 +120,18 @@ public class Librarian{
 			//We make a list of the recipes to be returned
 			myResults = new ArrayList<Recipe>();
 			while(rs.next()){
-				myResults.add(new Recipe(rs.getInt("R_id"), rs.getString("name"), getIngredientsinRecipe(rs.getInt("R_id")),rs.getInt("missing"),rs.getString("source"),rs.getString("imageURL")));
+				Recipe tempr = new Recipe();
+				tempr.rid = rs.getInt("R_id");
+				tempr.ingredients =getIngredientsinRecipe(rs.getInt("R_id"));
+				tempr.rating = rs.getDouble("rating");
+				tempr.steps = rs.getString("steps");
+				tempr.rname = rs.getString("rname");
+				tempr.imageurl = rs.getString("imageURL");
+				tempr.url = rs.getString("url");
+				tempr.cooktime = rs.getString("cooktime");
+				tempr.serving = rs.getString("serving");
+				tempr.missing = rs.getInt("missing");
+				myResults.add(tempr);
 			}
 		} catch (SQLException e){
 			System.out.println(e.getMessage());
@@ -126,7 +145,7 @@ public class Librarian{
 	public int getRecipeID(String title){
 		int myResult=-1;
 		try{
-			String myCmd = "SELECT R_id, name FROM recipes WHERE name = ?;";
+			String myCmd = "SELECT R_id, rname FROM recipes WHERE rname = ?;";
 			PreparedStatement ps1 = con.prepareStatement(myCmd);
 			ps1.setString(1, title);
 			ResultSet rs = ps1.executeQuery();
@@ -205,6 +224,7 @@ public class Librarian{
 			while(rs.next()){
 				listIng.ingredientnames.add(rs.getString("name"));
 				listIng.ingredientIDs.add(rs.getInt("I_id"));
+				listIng.amounts.add(rs.getString("amount"));
 				//(rs.getInt("I_id"), rs.getString("name"), rs.getString("amount"));
 			}
 			return listIng;
@@ -240,23 +260,28 @@ public class Librarian{
 		if(!enableStashing) return false;
 		stashIngredients(r.ingredients);
 		try{
-			PreparedStatement ps = con.prepareStatement("INSERT INTO recipes (R_id, name, source, imageURL, numIngredients) VALUES (?,?,?,?,?)");
+			PreparedStatement ps = con.prepareStatement("INSERT INTO recipes (R_id, rname, url, imageURL, numIngredients, steps, rating, cooktime, serving) VALUES (?,?,?,?,?,?,?,?,?)");
 			if(getRecipeID(r.rname)==-1){
 				int temp = getUnusedRID();
 				System.out.println(temp);
 				ps.setInt(1, temp);
 				ps.setString(2,r.rname);
-				ps.setString(3,r.source);
+				ps.setString(3,r.url);
 				ps.setString(4,r.imageurl);
 				ps.setInt(5, r.ingredients.ingredientIDs.size());
+				ps.setString(6, r.steps);
+				ps.setDouble(7,r.rating);
+				ps.setString(8,r.cooktime);
+				ps.setString(9,r.serving);
 				ps.executeUpdate();
 				usedRIDs.add(temp);
-				ps = con.prepareStatement("INSERT INTO IinR (R_id, I_id) VALUES (?,?)");
-				for(Integer i : r.ingredients.ingredientIDs) System.out.println(i);
-				for(Integer i : r.ingredients.ingredientIDs){
+				ps = con.prepareStatement("INSERT INTO IinR (R_id, I_id, amount) VALUES (?,?,?)");
+				int length = r.ingredients.ingredientIDs.size();
+				for(int i =0; i < length; i++){
 					System.out.println(temp + " " + i);
 					ps.setInt(1, temp);
-					ps.setInt(2, i);
+					ps.setInt(2, r.ingredients.ingredientIDs.get(i));
+					ps.setString(3, r.ingredients.amounts.get(i));
 					ps.executeUpdate();
 				}
 			}

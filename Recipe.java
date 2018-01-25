@@ -21,8 +21,8 @@ public class Recipe {
 
     public String serving;
 
-    //Number of ingredients missing. Only used if creating a JSON to be returned to the user
-    public int NoIngMiss;
+    public int missing;
+
     public Recipe(){
     }
 
@@ -30,8 +30,8 @@ public class Recipe {
     	rid = initRid;
     	rname = initRname;
     	ingredients = initingredients;
-    	NoIngMiss = initmissing;
-        source = initsource;
+    	missing = initmissing;
+        url = initsource;
         imageurl = initimageurl;
     }
 }
