@@ -241,6 +241,13 @@ public class Librarian{
 		} catch (SQLException e){
 			System.out.println("UpdateUsedIDs " + e.getMessage());
 		}
+		try{
+			Statement st = con.createStatement();
+			ResultSet rs = st.executeQuery("SELECT R_id FROM recipes;");
+			while(rs.next()) usedRIDs.add(rs.getInt("R_id"));
+		} catch (SQLException e){
+			System.out.println("UpdateUsedIDs " + e.getMessage());
+		}
 	}
 
 	static private int getUnusedIID(){
