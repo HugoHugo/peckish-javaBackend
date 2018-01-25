@@ -242,6 +242,7 @@ public class Message {
 			//byte [] bcon = getBytes(content);
 			//int bconSize = bcon.length;
 			Ingredient testIn = new Ingredient(2,"pasta");
+			str.writeBytes("HTTP/1.1 200 OK\nX-Powered-By: Express\nContent-Type: application/json; charset=utf-8\nConnection: close\n\n");
 			str.writeBytes(gson.toJson(testIn));
 			str.flush();
 			str.close();
