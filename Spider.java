@@ -51,7 +51,7 @@ public class Spider {
     /**
      * List of recipes.
      */
-    private List<Recipe> recipelist = new ArrayList<Recipe>();
+    public List<Recipe> recipelist = new ArrayList<Recipe>();
 
 	
     /**
