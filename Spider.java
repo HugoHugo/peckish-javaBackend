@@ -198,7 +198,6 @@ public class Spider {
 	    if (loscount == 0) {
 		amount = ai.replaceAll("[^0-9]+"," ");
 		ingred = ai.substring(ai.indexOf(amount.charAt(amount.length()-1)) + 1, ai.length());
-		ingred = ai;
 	    }
 	    else {
 		amount = ai.substring(0, ai.indexOf(los[loscount]) + los[loscount].length());
