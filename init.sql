@@ -16,7 +16,8 @@ CREATE TABLE recipes(
 
 CREATE TABLE ingredients(
 	I_id int primary key,
-	name text UNIQUE
+	name text UNIQUE,
+	type text
 );
 
 CREATE TABLE IinR(

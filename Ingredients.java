@@ -10,6 +10,8 @@ public class Ingredients {
 
     public List<String> amounts = new ArrayList<String>();
 
+    public List<String> types = new ArrayList<String>();
+
     public List<Integer> ingredientIDs = new ArrayList<Integer>();
 
 }
