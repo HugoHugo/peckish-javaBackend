@@ -28,10 +28,10 @@ public class Librarian{
 		Librarian mylib = new Librarian(bundle);
 		try{
 			Statement st = mylib.con.createStatement();
-			st.executeUpdate("set search_path to valent1;");
+			st.executeUpdate("set search_path to belezn1;");
 		}catch(SQLException e){;}
 		mylib.UpdateUsedIDs();
-		int testIngint = mylib.getIngredientID("Cheese");
+		int testIngint = mylib.getIngredientID("cheese");
 		String testIngString = mylib.getIngredientName(3);
 		System.out.println("Cheese has ID: " +testIngint);
 		System.out.println("The ingredient with ID 3 is " +testIngString);
@@ -86,7 +86,7 @@ public class Librarian{
 			Class.forName(driver);
 			con = DriverManager.getConnection(url, user, password);
 			Statement st = con.createStatement();
-			st.executeUpdate("set search_path to valent1;");
+			st.executeUpdate("set search_path to mca_i18_pantry;");
 			System.out.println("Connected with no exceptions");
 			UpdateUsedIDs();
 		} catch (ClassNotFoundException e){
@@ -138,6 +138,29 @@ public class Librarian{
 		return myResults;
 	}
 
+	public Recipe getRecipe(int Rid){
+		Recipe tempr = new Recipe();
+		try{
+			String myCmd = "SELECT * FROM recipes WHERE R_id = ?;";
+			PreparedStatement ps1 = con.prepareStatement(myCmd);
+			ps1.setInt(1, Rid);
+			ResultSet rs = ps1.executeQuery();
+			rs.next();
+			tempr.rid = rs.getInt("R_id");
+			tempr.ingredients =getIngredientsinRecipe(rs.getInt("R_id"));
+			tempr.rating = rs.getDouble("rating");
+			tempr.steps = rs.getString("steps");
+			tempr.rname = rs.getString("rname");
+			tempr.imageurl = rs.getString("imageURL");
+			tempr.url = rs.getString("url");
+			tempr.cooktime = rs.getString("cooktime");
+			tempr.serving = rs.getString("serving");
+		} catch (SQLException e){
+			System.out.println(e.getMessage());
+		}
+		return tempr;
+	}
+
 	/** A helper function that finds the ID of a recipe
 	@param title the exact name of the recipe in question
 	@return Rid*/
@@ -164,7 +187,7 @@ public class Librarian{
 		try{
 			String myCmd = "SELECT I_id, name FROM ingredients WHERE name = ?;";
 			PreparedStatement ps1 = con.prepareStatement(myCmd);
-			ps1.setString(1, ingred);
+			ps1.setString(1, ingred.toLowerCase());
 			ResultSet rs = ps1.executeQuery();
 			rs.next();
 			myResult = rs.getInt("I_id");
@@ -197,7 +220,9 @@ public class Librarian{
 		mylist.ingredientIDs = null;
 		mylist.ingredientIDs = new ArrayList<Integer>();
 		for(String name : mylist.ingredientnames){
-			mylist.ingredientIDs.add(getIngredientID(name));
+			int temp = getIngredientID(name.toLowerCase());
+			System.out.println("Get ID for \t" + name + "\t" + temp);
+			mylist.ingredientIDs.add(temp);
 		}
 	}
 
@@ -215,7 +240,7 @@ public class Librarian{
 	@return Ingredients is the ingredients object of that recipe*/
 	public Ingredients getIngredientsinRecipe(int Rid){
 		try{
-			String myCmd = "SELECT i.I_id, i.name, ir.amount FROM ingredients i, IinR ir WHERE ir.R_id = ? AND i.I_id = ir.I_id;";
+			String myCmd = "SELECT i.I_id, i.name, ir.amount, i.type FROM ingredients i, IinR ir WHERE ir.R_id = ? AND i.I_id = ir.I_id;";
 			Ingredients listIng = new Ingredients();
 			PreparedStatement ps = con.prepareStatement(myCmd);
 			ps.setInt(1, Rid);
@@ -224,6 +249,27 @@ public class Librarian{
 				listIng.ingredientnames.add(rs.getString("name"));
 				listIng.ingredientIDs.add(rs.getInt("I_id"));
 				listIng.amounts.add(rs.getString("amount"));
+				listIng.types.add(rs.getString("type"));
+				//(rs.getInt("I_id"), rs.getString("name"), rs.getString("amount"));
+			}
+			return listIng;
+		} catch (SQLException e){
+			System.out.println(e.getMessage());
+			return null;
+		}
+	}
+
+	public Ingredients getAllIngredients(){
+		try{
+			String myCmd = "SELECT I_id, name, type FROM ingredients;";
+			Ingredients listIng = new Ingredients();
+			PreparedStatement ps = con.prepareStatement(myCmd);
+			ResultSet rs = ps.executeQuery();
+			while(rs.next()){
+				listIng.ingredientnames.add(rs.getString("name"));
+				listIng.ingredientIDs.add(rs.getInt("I_id"));
+				listIng.amounts.add("n/a");
+				listIng.types.add(rs.getString("type"));
 				//(rs.getInt("I_id"), rs.getString("name"), rs.getString("amount"));
 			}
 			return listIng;
@@ -271,7 +317,7 @@ public class Librarian{
 				int temp = getUnusedRID();
 				System.out.println(temp);
 				ps.setInt(1, temp);
-				ps.setString(2,r.rname);
+				ps.setString(2,r.rname.toLowerCase());
 				ps.setString(3,r.url);
 				ps.setString(4,r.imageurl);
 				ps.setInt(5, r.ingredients.ingredientIDs.size());
@@ -300,23 +346,25 @@ public class Librarian{
 
 	public boolean stashIngredients(Ingredients ings){
 		if(!enableStashing) return false;
+		System.out.println("boop");
 		fillIID(ings);
 		try{
 			PreparedStatement ps = con.prepareStatement("INSERT INTO ingredients (I_id, name) VALUES (?,?)");
 			for(int i = 0; i<ings.ingredientIDs.size(); i++){
 				if(ings.ingredientIDs.get(i) == -1){
 					int temp = getUnusedIID();
+					System.out.println("Adding Ingredient:" + ings.ingredientnames.get(i));
 					ps.setInt(1, temp);
-					ps.setString(2,ings.ingredientnames.get(i));
+					ps.setString(2,ings.ingredientnames.get(i).toLowerCase());
 					ps.executeUpdate();
 					usedIIDs.add(temp);
 				}
 			}
-			fillIID(ings);
 		} catch (SQLException e){
 			System.out.println("stashIngredients " + e.getMessage());
 			return false;
 		}
+		fillIID(ings);
 		return true;
 	}
 }

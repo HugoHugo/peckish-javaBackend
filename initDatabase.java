@@ -8,7 +8,7 @@ public class initDatabase{
 		Librarian mylib = new Librarian(bundle);
 		try{
 			Statement st = mylib.con.createStatement();
-			st.executeUpdate("CREATE TABLE ingredients(I_id int primary key, name text UNIQUE);");
+			st.executeUpdate("CREATE TABLE ingredients(I_id int primary key, name text UNIQUE, type text);");
 		}catch(SQLException e){System.out.println(e.getMessage());}
 		try{
 			Statement st = mylib.con.createStatement();
@@ -17,6 +17,10 @@ public class initDatabase{
 		try{
 			Statement st = mylib.con.createStatement();
 			st.executeUpdate("CREATE TABLE IinR(R_id int references recipes(R_id),I_id int references ingredients(I_id),amount text DEFAULT 'a pinch',unique(R_id, I_id));");
+		}catch(SQLException e){System.out.println(e.getMessage());}
+		try{
+			Statement st = mylib.con.createStatement();
+			st.executeUpdate("GRANT ALL PRIVILEGES ON ingredients, recipes, IinR TO irelan1,valent1,radueg1,belezn1;");
 		}catch(SQLException e){System.out.println(e.getMessage());}
 
 
