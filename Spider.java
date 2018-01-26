@@ -203,10 +203,17 @@ public class Spider {
 		amount = ai.substring(0, ai.indexOf(los[loscount]) + los[loscount].length());
 		ingred = ai.substring(ai.indexOf(los[loscount]) + los[loscount].length(), ai.length());
 	    }
+	    if (ingred.indexOf(",") != -1) {
+		int start2 = ingred.indexOf(",");
+		int end2 = ingred.length();
+		amount = amount.concat(ingred.substring(start2,end2));
+		ingred = ingred.substring(0,start2);
+	    }
 	    amount = amount.trim();
 	    ingred = ingred.trim();
 	    yummy.ingredients.amounts.add(amount);
 	    yummy.ingredients.ingredientnames.add(ingred);
+	    System.out.println(amount + "\t" + "\t" + ingred);
 	    beginhere = end;
 	}
 	
