@@ -6,15 +6,11 @@ import java.lang.*;
 import java.io.*;
 
 /**
- * Downloads web page content starting with a starting url.
- * If the spider encounters links in the content, it downloads
- * those as well.
- * 
- * Steps:
- * 1. Complete the processPage method.  One TestSpider unit tests should pass.
- * 2. Complete the crawl() method.  Both TestSpider unit tests should pass.
- *  
- * @author shilad
+ * Downloads web page content starting with a starting url, then moves 
+ *  on to the next webpage for another recipe, until "maxUrls" recipes
+ * have been found. Note that this Spider is specifically designed to
+ * scrape recipes from allrecipes.com.
+ * @author shilad, Brenden Ireland
  *
  */
 public class Spider {
@@ -44,7 +40,7 @@ public class Spider {
     private HttpHelper helper = new HttpHelper();
     
     /** 
-     * Keep count of recipes made.
+     * Keep count of recipes delivered.
      */
     private static int recipecounter = 0;
 
@@ -64,8 +60,7 @@ public class Spider {
     
     /**
      * Crawls at most maxUrls starting with beginningUrl.
-     * @param beginningUrl Starting URL, indicating a web page that 
-     potentially contains other URLs.
+     * @param beginningUrl Starting URL.
     */
     public void crawl(String beginningUrl) {
 	urlCounter.countWord(beginningUrl);
@@ -113,8 +108,13 @@ public class Spider {
 
 
     
-    /** Create a new Recipe object and add info to it */
+    /** 
+     * Creates a new Recipe object and adds info to it.
+     * @param url A URL that contains recipe information.
+     * @param html The html content of the given URL.
+     */
     public Recipe recipewriter (String url, String html) {
+	/* Defining variables that will be useful in the search for recipe info. */
 	Recipe yummy = new Recipe();
 	String keyphrase = null;
 	String keyphrase2 = null;
@@ -172,6 +172,8 @@ public class Spider {
 	units.add("can");
 	units.add("inch");
 	units.add("inches");
+	units.add("package");
+	units.add("packages");
 		
 	/* Record URL of recipe. */
 	yummy.url = url;
@@ -194,13 +196,15 @@ public class Spider {
 		    loscount = i;
 	    }
 	    if (loscount == 0) {
-	        amount = null;
-		ingred = ai;
+		amount = ai.replaceAll("[^0-9]+"," ");
+		ingred = ai.substring(ai.indexOf(amount.charAt(amount.length()-1)) + 1, ai.length());
 	    }
 	    else {
 		amount = ai.substring(0, ai.indexOf(los[loscount]) + los[loscount].length());
 		ingred = ai.substring(ai.indexOf(los[loscount]) + los[loscount].length(), ai.length());
 	    }
+	    amount = amount.trim();
+	    ingred = ingred.trim();
 	    yummy.ingredients.amounts.add(amount);
 	    yummy.ingredients.ingredientnames.add(ingred);
 	    beginhere = end;
@@ -267,22 +271,20 @@ public class Spider {
 	end = html.indexOf(keyphrase2, start);
 	yummy.serving = html.substring(start,end);
 
-	/* Wrap it up */
+	/* Printing out info - used for testing and bug searching */
 	// System.out.println("rname: " + "\t" + yummy.rname);
 	// System.out.println("url: " + "\t" + yummy.url);
 	// System.out.println("imageurl: " + "\t" + yummy.imageurl);
-	// System.out.println("rid: " + "\t" + yummy.rid);
-	// System.out.println("iid: " + "\t" + yummy.ingredients.iid);
 	// for (int i = 0; i < yummy.ingredients.ingredientnames.size(); i++)
-	//     System.out.println(yummy.ingredients.amounts.get(i) + "\t" + yummy.ingredients.ingredientnames.get(i));
+	//     System.out.println(yummy.ingredients.amounts.get(i) + "\t" + "\t" + yummy.ingredients.ingredientnames.get(i));
 	// System.out.println("rating: " + "\t" + yummy.rating);
 	// System.out.println(yummy.steps);
-	// System.out.println();
-	// System.out.println();
 	// System.out.println(yummy.cooktime);
 	// System.out.println(yummy.serving);
+	// System.out.println();
+	// System.out.println();
 	
-	
+	/* Wrapping it up */
 	recipecounter++;
 	return yummy;
     }

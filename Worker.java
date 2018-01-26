@@ -21,16 +21,35 @@ public class Worker implements Runnable {
     try{
       InputStream inStream = sock.getInputStream();
       OutputStream outStream = sock.getOutputStream();
+      Ingredients tempIn = new Ingredients();
       while(true){
         Message m = new Message(inStream);
           if(m.type.equals("getFile")){
             getFile(m);
           }
           if(m.type.equals("GET")){
+	    m.myIngredients = tempIn;
+	    System.out.println("################# OUR INGREDIENTS ###################");
+	    System.out.println(tempIn.ingredientnames.size());
+            for(String s:tempIn.ingredientnames){
+			System.out.println("################# OUR INGREDIENTS ###################");
+			System.out.println(s);
+		}
             handleGET(m);
           }
-          Message m2 = new Message("ACK","");
-          m2.send(outStream);
+          if(m.type.equals("POST")){
+            tempIn = m.myIngredients;
+	    m.myIngredients = tempIn;
+	    System.out.println("################# OUR INGREDIENTS ###################");
+	    System.out.println(tempIn.ingredientnames.size());
+            for(String s:tempIn.ingredientnames){
+			System.out.println("################# OUR INGREDIENTS ###################");
+			System.out.println(s);
+		}
+            handleGET(m);
+          }
+          //Message m2 = new Message("ACK","");
+          //m2.send(outStream);
         String endm = "END";
         if(m.content.regionMatches(0,endm,0,3) || m.content.regionMatches(0,"EOT",0,3)){
           sock.close();
@@ -44,8 +63,10 @@ public class Worker implements Runnable {
 
   public void handleGET(Message m){	
 	try{
+		
 		DataOutputStream outStream = new DataOutputStream(sock.getOutputStream());
 		Message m3 = new Message("GET","");
+		m3.myRecipes=mylib.searchPotentialRecipes(m.myIngredients);
 		m3.sendData(outStream);
 	} catch(IOException e){
 		System.out.println(e.getMessage());
