@@ -27,5 +27,6 @@ public class RunSpider {
     for(Recipe r : recipelist){
       mylib.stashRecipe(r);
     }
+    mylib.updateDefaultIngredients();
   }
 }
