@@ -23,6 +23,8 @@ public class Recipe {
 
     public int missing;
 
+    public String source;
+
     public Recipe(){
     }
 

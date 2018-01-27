@@ -15,12 +15,17 @@ public class Librarian{
 	private static String driver;
 	/** The variable referencing the open connection to the database */
 	public Connection con;
-	/** list of IDs already in use */
+	/** list of IIDs already in use */
 	static private List<Integer> usedIIDs = new ArrayList<Integer>();
+	/** list of RIDs already in use */
 	static private List<Integer> usedRIDs = new ArrayList<Integer>();
+	/** A String containing the beginning of a list of the I_ids of the default ingredients
+	It contains water, salt, pepper by default */
+	static private String defaultIngredients = "(0,1,2";
 
 	/** In case of parallelization*/
 	static private boolean stashing = false;
+	/** In case of parallelization*/
 	static private boolean enableStashing = true;
 
 	public static void main(String[] args){
@@ -108,9 +113,8 @@ public class Librarian{
 			System.out.println("Starting search for ingredients");
 			//We make a command to look for the number of ingredients missing for each recipe, and select those that have less than 4 missing
 			Statement st = con.createStatement();
-			String myCommand = "SELECT sub.thing AS missing, sub.R_id, r.rname, r.numIngredients, r.url, r.imageURL, r.rating, r.steps, r.cooktime, r.serving FROM (SELECT r.R_id, MAX(r.numIngredients) - COUNT(*) AS thing FROM IinR ir, recipes r WHERE r.R_id=ir.R_id AND ir.I_id in (";
-			myCommand = myCommand + ingredientlist.ingredientIDs.get(0);
-			for(int i=1;i<ingredientlist.ingredientIDs.size();i++){
+			String myCommand = "SELECT sub.thing AS missing, sub.R_id, r.rname, r.numIngredients, r.url, r.imageURL, r.rating, r.steps, r.cooktime, r.serving, r.source FROM (SELECT r.R_id, MAX(r.numIngredients) - COUNT(*) AS thing FROM IinR ir, recipes r WHERE r.R_id=ir.R_id AND ir.I_id in "+defaultIngredients;
+			for(int i=0;i<ingredientlist.ingredientIDs.size();i++){
 				myCommand = myCommand + "," + ingredientlist.ingredientIDs.get(i);
 			}
 			myCommand = myCommand + ") GROUP BY r.R_id) AS sub, recipes r WHERE sub.thing <= 4 AND r.R_id=sub.R_id ORDER BY missing;";
@@ -130,6 +134,7 @@ public class Librarian{
 				tempr.cooktime = rs.getString("cooktime");
 				tempr.serving = rs.getString("serving");
 				tempr.missing = rs.getInt("missing");
+				tempr.source = rs.getString("source");
 				myResults.add(tempr);
 			}
 		} catch (SQLException e){
@@ -138,6 +143,9 @@ public class Librarian{
 		return myResults;
 	}
 
+	/** Searches the database for the recipe corresponding to the ID, and returns it
+	@param Rid the ID of the recipe in question
+	@return the appropriate Recipe object*/
 	public Recipe getRecipe(int Rid){
 		Recipe tempr = new Recipe();
 		try{
@@ -155,6 +163,7 @@ public class Librarian{
 			tempr.url = rs.getString("url");
 			tempr.cooktime = rs.getString("cooktime");
 			tempr.serving = rs.getString("serving");
+			tempr.source = rs.getString("source");
 		} catch (SQLException e){
 			System.out.println(e.getMessage());
 		}
@@ -259,6 +268,8 @@ public class Librarian{
 		}
 	}
 
+	/** This function returns an ingredients object containing all ingredients currently in the database
+	@return Ingredients is the ingredients object of that recipe*/
 	public Ingredients getAllIngredients(){
 		try{
 			String myCmd = "SELECT I_id, name, type FROM ingredients;";
@@ -278,7 +289,7 @@ public class Librarian{
 			return null;
 		}
 	}
-
+	/** Checks the database and updates the list of IDs already in the Database */
 	public void UpdateUsedIDs(){
 		try{
 			Statement st = con.createStatement();
@@ -296,18 +307,25 @@ public class Librarian{
 		}
 	}
 
+	/** Helper function that returns the lowest unused I_id
+	@return An unused I_id*/
 	static private int getUnusedIID(){
 		int i=0;
 		while(usedIIDs.contains(i)) i=i+1;
 		return i;
 	}
 
+	/** Helper function that returns the lowest unused R_id
+	@return An unused R_id*/
 	static private int getUnusedRID(){
 		int i=0;
 		while(usedRIDs.contains(i)) i=i+1;
 		return i;
 	}
 
+	/**Function that stores a recipe in the database if it isn't there already
+	@param r is the recipe object to be stored in the database
+	@return a boolean representing whether or not the operation succeeded*/
 	public boolean stashRecipe(Recipe r){
 		if(!enableStashing) return false;
 		stashIngredients(r.ingredients);
@@ -317,7 +335,7 @@ public class Librarian{
 				int temp = getUnusedRID();
 				System.out.println(temp);
 				ps.setInt(1, temp);
-				ps.setString(2,r.rname.toLowerCase());
+				ps.setString(2,r.rname);
 				ps.setString(3,r.url);
 				ps.setString(4,r.imageurl);
 				ps.setInt(5, r.ingredients.ingredientIDs.size());
@@ -344,6 +362,12 @@ public class Librarian{
 		return true;
 	}
 
+	/**Function that goes through all ingredient names in an Ingredients
+	object and stores them in the database if they aren't there already.
+	In the process, it refills the I_ids of each ingredient name to the
+	values that match the database
+	@param ings is the Ingredients object to be stored in the database
+	@return a boolean representing whether or not the operation succeeded*/
 	public boolean stashIngredients(Ingredients ings){
 		if(!enableStashing) return false;
 		System.out.println("boop");
@@ -366,5 +390,22 @@ public class Librarian{
 		}
 		fillIID(ings);
 		return true;
+	}
+
+	/** Helper function that makes sure all the
+	'default ingredients' (like 'add pepper to taste') are kept track of*/
+	public void updateDefaultIngredients(){
+		try{
+			String myCmd = "SELECT I_id FROM ingredients WHERE name ~* '.*(salt ).*' OR name ~* '.*(black pepper).*' OR (name ~* '.*(pepper).*' AND name ~* '.*(to taste).*');";
+			Statement st = con.createStatement();
+			ResultSet rs = st.executeQuery(myCmd);
+			defaultIngredients = "(0,1,2";
+			while(rs.next()){
+				defaultIngredients = defaultIngredients + "," + rs.getInt("I_id");
+			}
+		} catch (SQLException e){
+			System.out.println(e.getMessage());
+		}
+		System.out.println(defaultIngredients);
 	}
 }

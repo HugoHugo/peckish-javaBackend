@@ -12,7 +12,7 @@ public class initDatabase{
 		}catch(SQLException e){System.out.println(e.getMessage());}
 		try{
 			Statement st = mylib.con.createStatement();
-			st.executeUpdate("CREATE TABLE recipes(R_id int primary key,rname text,steps text,numIngredients int,rating double precision,cooktime text,serving text,url text DEFAULT 'https://wp.stolaf.edu/',imageURL text DEFAULT 'https://cdn.pixabay.com/photo/2013/11/24/10/40/dessert-216870_960_720.jpg');");
+			st.executeUpdate("CREATE TABLE recipes(R_id int primary key,rname text,steps text,numIngredients int,rating double precision,cooktime text,serving text,url text DEFAULT 'https://wp.stolaf.edu/',imageURL text DEFAULT 'https://cdn.pixabay.com/photo/2013/11/24/10/40/dessert-216870_960_720.jpg',source text DEFAULT 'AllRecipes.com');");
 		}catch(SQLException e){System.out.println(e.getMessage());}
 		try{
 			Statement st = mylib.con.createStatement();
@@ -24,7 +24,7 @@ public class initDatabase{
 		}catch(SQLException e){System.out.println(e.getMessage());}
 
 
-		String[] temp = {"elbow macaroni","butter","dijon mustard","cayenne pepper","shredded sharp cheddar", "flour","tomatoes","dry yeast","mozarella","basil","oregano","white onions","garlic","pepperoni","mushrooms","tomato sauce","mango","apples","rice","sausages","bell peppers","arugala","bamboo shoots","cauliflower","camerbert","bacon","ricotta"};
+		String[] temp = {"water","salt","pepper"};
 		List<String> ingnames = Arrays.asList(temp);
 		Ingredients testIng = new Ingredients();
 		testIng.ingredientnames = ingnames;
