@@ -66,8 +66,15 @@ public class Worker implements Runnable {
 		
 		DataOutputStream outStream = new DataOutputStream(sock.getOutputStream());
 		Message m3 = new Message("GET","");
-		m3.myRecipes=mylib.searchPotentialRecipes(m.myIngredients);
-		m3.sendData(outStream);
+		if(m.requestedUrl == "/getallingredients"){
+			m3.requestedUrl = m.requestedUrl;
+			m3.myIngredients=mylib.getAllIngredients();
+			m3.sendData(outStream);
+		}
+		else {
+			m3.myRecipes=mylib.searchPotentialRecipes(m.myIngredients);
+			m3.sendData(outStream);
+		}
 	} catch(IOException e){
 		System.out.println(e.getMessage());
 	}
