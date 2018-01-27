@@ -248,17 +248,18 @@ public class Message {
 	}
 	
 	public void sendData(DataOutputStream str) throws IOException {
+		String header = "HTTP/1.1 200 OK\nX-Powered-By: Express\nContent-Type: application/json; charset=utf-8\nConnection: close\n\n";
 		if (type == "GET" && requestedUrl == null){
 			Gson gson = new GsonBuilder().setLenient().create();
 			content = gson.toJson("GetData={hello: yeah}");
-			str.writeBytes("HTTP/1.1 200 OK\nX-Powered-By: Express\nContent-Type: application/json; charset=utf-8\nConnection: close\n\n");
+			str.writeBytes(header);
 			str.writeBytes(gson.toJson(myRecipes));
 			str.flush();
 			str.close();
 		}
 		else if(type == "GET" && requestedUrl == "/getallingredients"){
 			Gson gson = new GsonBuilder().setLenient().create();
-			str.writeBytes("HTTP/1.1 200 OK\nX-Powered-By: Express\nContent-Type: application/json; charset=utf-8\nConnection: close\n\n");
+			str.writeBytes(header);
 			str.writeBytes(gson.toJson(myIngredients));
 			str.flush();
 			str.close();
