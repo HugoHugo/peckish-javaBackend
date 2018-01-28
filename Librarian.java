@@ -31,50 +31,13 @@ public class Librarian{
 	public static void main(String[] args){
 		ResourceBundle bundle = ResourceBundle.getBundle("javaconfig");
 		Librarian mylib = new Librarian(bundle);
-		try{
-			Statement st = mylib.con.createStatement();
-			st.executeUpdate("set search_path to belezn1;");
-		}catch(SQLException e){;}
-		mylib.UpdateUsedIDs();
-		int testIngint = mylib.getIngredientID("cheese");
-		String testIngString = mylib.getIngredientName(3);
-		System.out.println("Cheese has ID: " +testIngint);
-		System.out.println("The ingredient with ID 3 is " +testIngString);
-		List<Integer> ingList = new ArrayList<Integer>();
-		ingList.add(1);ingList.add(2);ingList.add(5);
-		Ingredients testIng = new Ingredients();
-		testIng.ingredientIDs = ingList;
-		mylib.fillIname(testIng);
-		List<Recipe> resReceps = mylib.searchPotentialRecipes(testIng);
-		System.out.println("Recipes found: " + resReceps.size());
-		for(Recipe r : resReceps){
-			System.out.println(r.rname +" is missing " + r.missing + " ingredients.");
-		}
-		System.out.println("\n About to test adding stuff to the database");
-		testIng = new Ingredients();
-		testIng.ingredientnames.add("salt");
-		testIng.amounts.add("1/2 tsp");
-		testIng.ingredientnames.add("elbow macaroni");
-		testIng.amounts.add("2 cups");
-		testIng.ingredientnames.add("butter");
-		testIng.amounts.add("2 Tbsp");
-		testIng.ingredientnames.add("dijon mustard");
-		testIng.amounts.add("1/2 tsps");
-		testIng.ingredientnames.add("cayenne pepper");
-		testIng.amounts.add("1 pinch");
-		testIng.ingredientnames.add("sharp cheddar");
-		testIng.amounts.add("1.5 cups shredded");
-		Recipe myR = new Recipe();
-		myR.rname = "Macaroni and Cheese";
-		myR.ingredients = testIng;
-		myR.url = "BudgetBytes";
-		enableStashing = true;
-		mylib.stashRecipe(myR);
+		//mylib.UpdateUsedIDs();
+		//mylib.updateDefaultIngredients();
 		List<String> ingList2 = new ArrayList<String>();
-		ingList2.add("elbow macaroni");ingList2.add("Cheese");
-		testIng = new Ingredients();
+		ingList2.add("macaroni");ingList2.add("eggs");ingList2.add("milk");
+		Ingredients testIng = new Ingredients();
 		testIng.ingredientnames = ingList2;
-		resReceps = mylib.searchPotentialRecipes(testIng);
+		List<Recipe> resReceps = mylib.searchPotentialRecipes(testIng);
 		System.out.println("Recipes found: " + resReceps.size());
 		for(Recipe r : resReceps){
 			System.out.println(r.rname +" is missing " + r.missing + " ingredients.");
@@ -94,6 +57,7 @@ public class Librarian{
 			st.executeUpdate("set search_path to mca_i18_pantry;");
 			System.out.println("Connected with no exceptions");
 			UpdateUsedIDs();
+			updateDefaultIngredients();
 		} catch (ClassNotFoundException e){
 			System.out.println("Error Connecting to Database:");
 			System.out.println(e.getMessage());
@@ -117,7 +81,7 @@ public class Librarian{
 			for(int i=0;i<ingredientlist.ingredientIDs.size();i++){
 				myCommand = myCommand + "," + ingredientlist.ingredientIDs.get(i);
 			}
-			myCommand = myCommand + ") GROUP BY r.R_id) AS sub, recipes r WHERE sub.thing <= 4 AND r.R_id=sub.R_id ORDER BY missing;";
+			myCommand = myCommand + ") GROUP BY r.R_id) AS sub, recipes r WHERE sub.thing <= 15 AND r.R_id=sub.R_id ORDER BY missing;";
 			//We ask for the recipes
 			ResultSet rs = st.executeQuery(myCommand);
 			//We make a list of the recipes to be returned
