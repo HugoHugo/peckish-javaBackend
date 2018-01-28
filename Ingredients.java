@@ -14,4 +14,6 @@ public class Ingredients {
 
     public List<Integer> ingredientIDs = new ArrayList<Integer>();
 
+    public List<Integer> freqs = new ArrayList<Integer>();
+
 }
