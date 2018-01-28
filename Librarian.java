@@ -22,6 +22,8 @@ public class Librarian{
 	/** A String containing the beginning of a list of the I_ids of the default ingredients
 	It contains water, salt, pepper by default */
 	static private String defaultIngredients = "(0,1,2";
+	/** A list version of the previous */
+	static private List<Integer> defIngList;
 
 	/** In case of parallelization*/
 	static private boolean stashing = false;
@@ -41,6 +43,10 @@ public class Librarian{
 		System.out.println("Recipes found: " + resReceps.size());
 		for(Recipe r : resReceps){
 			System.out.println(r.rname +" is missing " + r.missing + " ingredients.");
+		}
+		Ingredients is = mylib.getAllIngredients();
+		for(String s : is.ingredientnames){
+			System.out.println(s);
 		}
 	}
 
@@ -236,16 +242,17 @@ public class Librarian{
 	@return Ingredients is the ingredients object of that recipe*/
 	public Ingredients getAllIngredients(){
 		try{
-			String myCmd = "SELECT I_id, name, type FROM ingredients;";
+			String myCmd = "SELECT i.I_id, i.name, i.type, COUNT(*) AS freq FROM ingredients i, iinr ir WHERE i.I_id= ir.I_id GROUP BY i.I_id, i.name, i.type ORDER BY freq DESC;";
 			Ingredients listIng = new Ingredients();
 			PreparedStatement ps = con.prepareStatement(myCmd);
 			ResultSet rs = ps.executeQuery();
 			while(rs.next()){
-				listIng.ingredientnames.add(rs.getString("name"));
-				listIng.ingredientIDs.add(rs.getInt("I_id"));
-				listIng.amounts.add("n/a");
-				listIng.types.add(rs.getString("type"));
-				//(rs.getInt("I_id"), rs.getString("name"), rs.getString("amount"));
+				if(!defIngList.contains(rs.getInt("I_id"))){
+					listIng.ingredientnames.add(rs.getString("name"));
+					listIng.ingredientIDs.add(rs.getInt("I_id"));
+					listIng.amounts.add("n/a");
+					listIng.types.add(rs.getString("type"));
+				}
 			}
 			return listIng;
 		} catch (SQLException e){
@@ -364,8 +371,11 @@ public class Librarian{
 			Statement st = con.createStatement();
 			ResultSet rs = st.executeQuery(myCmd);
 			defaultIngredients = "(0,1,2";
+			defIngList= new ArrayList<Integer>(Arrays.asList(0,1,2));
 			while(rs.next()){
-				defaultIngredients = defaultIngredients + "," + rs.getInt("I_id");
+				Integer tempInt = rs.getInt("I_id");
+				defaultIngredients = defaultIngredients + "," + tempInt;
+				defIngList.add(tempInt);
 			}
 		} catch (SQLException e){
 			System.out.println(e.getMessage());
