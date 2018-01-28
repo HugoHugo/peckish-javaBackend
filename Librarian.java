@@ -229,6 +229,7 @@ public class Librarian{
 				listIng.ingredientIDs.add(rs.getInt("I_id"));
 				listIng.amounts.add(rs.getString("amount"));
 				listIng.types.add(rs.getString("type"));
+				listIng.freqs.add(1);
 				//(rs.getInt("I_id"), rs.getString("name"), rs.getString("amount"));
 			}
 			return listIng;
@@ -252,6 +253,7 @@ public class Librarian{
 					listIng.ingredientIDs.add(rs.getInt("I_id"));
 					listIng.amounts.add("n/a");
 					listIng.types.add(rs.getString("type"));
+					listIng.freqs.add(rs.getInt("freq"));
 				}
 			}
 			return listIng;
@@ -344,13 +346,14 @@ public class Librarian{
 		System.out.println("boop");
 		fillIID(ings);
 		try{
-			PreparedStatement ps = con.prepareStatement("INSERT INTO ingredients (I_id, name) VALUES (?,?)");
+			PreparedStatement ps = con.prepareStatement("INSERT INTO ingredients (I_id, name, type) VALUES (?,?,?)");
 			for(int i = 0; i<ings.ingredientIDs.size(); i++){
 				if(ings.ingredientIDs.get(i) == -1){
 					int temp = getUnusedIID();
 					System.out.println("Adding Ingredient:" + ings.ingredientnames.get(i));
 					ps.setInt(1, temp);
 					ps.setString(2,ings.ingredientnames.get(i).toLowerCase());
+					ps.setString(3, "non-poisonous");
 					ps.executeUpdate();
 					usedIIDs.add(temp);
 				}
