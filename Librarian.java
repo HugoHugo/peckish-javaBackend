@@ -333,11 +333,13 @@ public class Librarian{
 			}
 			ResultSet rs = ps.executeQuery();
 			while(rs.next()){
-				listIng.ingredientnames.add(rs.getString("name"));
-				listIng.ingredientIDs.add(rs.getInt("I_id"));
-				listIng.amounts.add("n/a");
-				listIng.types.add(rs.getString("type"));
-				listIng.freqs.add(1);
+				if(!defIngList.contains(rs.getInt("I_id"))){
+					listIng.ingredientnames.add(rs.getString("name"));
+					listIng.ingredientIDs.add(rs.getInt("I_id"));
+					listIng.amounts.add("n/a");
+					listIng.types.add(rs.getString("type"));
+					listIng.freqs.add(1);
+				}
 				//(rs.getInt("I_id"), rs.getString("name"), rs.getString("amount"));
 			}
 			return listIng;
@@ -389,7 +391,7 @@ public class Librarian{
 		if(!enableStashing) return false;
 		stashIngredients(r.ingredients);
 		try{
-			PreparedStatement ps = con.prepareStatement("INSERT INTO recipes (R_id, rname, url, imageURL, numIngredients, steps, rating, cooktime, serving) VALUES (?,?,?,?,?,?,?,?,?)");
+			PreparedStatement ps = con.prepareStatement("INSERT INTO recipes (R_id, rname, url, imageURL, numIngredients, steps, rating, cooktime, serving, source) VALUES (?,?,?,?,?,?,?,?,?,?)");
 			if(getRecipeID(r.rname)==-1){
 				int temp = getUnusedRID();
 				System.out.println(temp);
@@ -402,6 +404,7 @@ public class Librarian{
 				ps.setDouble(7,r.rating);
 				ps.setString(8,r.cooktime);
 				ps.setString(9,r.serving);
+				ps.setString(10,r.source);
 				ps.executeUpdate();
 				usedRIDs.add(temp);
 				ps = con.prepareStatement("INSERT INTO IinR (R_id, I_id, amount) VALUES (?,?,?)");
