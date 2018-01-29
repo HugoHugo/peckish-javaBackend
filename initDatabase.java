@@ -49,6 +49,8 @@ public class initDatabase{
 		myR.rating = 4.19;
 		myR.steps = "Directions: Fill the skillet two-thirds full of water, add the salt, and bring to a boil over medium-high heat. Add the macaroni, turn the heat to medium, and cook, stirring occasionally, until just shy of al dente. This should take about 10 minutes, but check the pasta package for recommended cooking times and aim for the lower end if a range is given. (The macaroni will continue to cook a bit in the sauce.) When the macaroni is ready, biting into a piece should reveal a very thin core of uncooked pasta. Drain the macaroni and return it to the skillet. Turn the heat to low. Add the butter and stir until it melts. Add the evaporated milk, mustard, and cayenne and stir well to combine. Add the cheese in three batches, stirring frequently as each batch is added and waiting until the cheese has melted before adding the next batch. After about 5 minutes total, the sauce will be smooth and noticeably thicker. Serve hot. Leftovers can be refrigerated in a covered container for up to 2 days.";
 		myR.url = "https://www.budgetbytes.com/2017/04/will-skillet-mac-cheese/";
+		myR.serving = "2";
+		myR.cooktime = "20 m";
 		myR.imageURL = "https://www.budgetbytes.com/wp-content/uploads/2017/04/Will-It-Skillet-Mac-and-Cheese-close.jpg";
 		mylib.stashRecipe(myR);
 		System.out.println("Done. (Theoretically)");
