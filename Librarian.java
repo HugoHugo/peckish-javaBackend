@@ -44,7 +44,7 @@ public class Librarian{
 		for(Recipe r : resReceps){
 			System.out.println(r.rname +" is missing " + r.missing + " ingredients.");
 		}
-		Ingredients is = mylib.searchIngredients("Hugo's egg and parmesan beef");
+		Ingredients is = mylib.searchIngredients("Brown Eggs 12 eggs");
 		System.out.println(is.ingredientnames.size());
 		for(String s : is.ingredientnames){
 			System.out.println(s);
@@ -329,7 +329,7 @@ public class Librarian{
 			PreparedStatement ps = con.prepareStatement(myCmd);
 			System.out.println(myCmd);
 			for(int i = 0; i<words.length;i++){
-				ps.setString(i+1,".*("+words[i]+").*");
+				ps.setString(i+1,".*("+words[i].toLowerCase()+").*");
 			}
 			ResultSet rs = ps.executeQuery();
 			while(rs.next()){
