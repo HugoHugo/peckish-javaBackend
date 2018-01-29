@@ -38,6 +38,10 @@ public class Worker implements Runnable {
             handleGET(m);
           }
           if(m.type.equals("POST")){
+	    if(m.requestedUrl.equals("/lookupproduct")){
+			handleGET(m);
+	    }
+	    else{
             tempIn = m.myIngredients;
 	    m.myIngredients = tempIn;
 	    System.out.println("################# OUR INGREDIENTS ###################");
@@ -47,9 +51,8 @@ public class Worker implements Runnable {
 			System.out.println(s);
 		}
             handleGET(m);
+	    }
           }
-          //Message m2 = new Message("ACK","");
-          //m2.send(outStream);
         String endm = "END";
         if(m.content.regionMatches(0,endm,0,3) || m.content.regionMatches(0,"EOT",0,3)){
           sock.close();
@@ -69,6 +72,12 @@ public class Worker implements Runnable {
 		if(m.requestedUrl == "/getallingredients"){
 			m3.requestedUrl = m.requestedUrl;
 			m3.myIngredients=mylib.getAllIngredients();
+			m3.sendData(outStream);
+		}
+		if(m.requestedUrl == "/lookupproduct"){
+			m3.requestedUrl = m.requestedUrl;
+			m3.type = "POST";
+			m3.myIngredients = mylib.searchIngredients(m.content);
 			m3.sendData(outStream);
 		}
 		else {
