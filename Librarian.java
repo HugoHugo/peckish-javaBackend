@@ -44,7 +44,8 @@ public class Librarian{
 		for(Recipe r : resReceps){
 			System.out.println(r.rname +" is missing " + r.missing + " ingredients.");
 		}
-		Ingredients is = mylib.getAllIngredients();
+		Ingredients is = mylib.searchIngredients("Hugo's egg and parmesan beef");
+		System.out.println(is.ingredientnames.size());
 		for(String s : is.ingredientnames){
 			System.out.println(s);
 		}
@@ -194,6 +195,24 @@ public class Librarian{
 		return myResult;
 	}
 
+	/** A helper function that finds the ID of an ingredient with a known barcode
+	@param the barcode to search for
+	@return the appropriate Ingredient ID*/
+	public String getIngredientNameByBarcode(String code){
+		String myResult = "not found";
+		try{
+			String myCmd = "SELECT i.name FROM ingredients i, barcodes b WHERE i.I_id= AND code = ?;";
+			PreparedStatement ps1 = con.prepareStatement(myCmd);
+			ps1.setString(1, code);
+			ResultSet rs = ps1.executeQuery();
+			rs.next();
+			myResult = rs.getString("name");
+		} catch (SQLException e){
+			System.out.println("Ingredient not found");
+		}
+		return myResult;
+	}
+
 	/** Helper function to match IDs to ingredient names  */
 	public void fillIID(Ingredients mylist){
 		mylist.ingredientIDs = null;
@@ -262,6 +281,42 @@ public class Librarian{
 			return null;
 		}
 	}
+
+	/** A function that searches the list of ingredients that have any of the search words in its name
+	@param Search string
+	@return Ingredients matching the search*/
+	public Ingredients searchIngredients(String search){
+		try{
+			String[] words = search.split(" ");
+			System.out.println(words.length);
+			String condition = " name ~* ?";
+			for(int i=1; i < words.length; i++){
+				condition = condition + " OR name ~* ?";
+			} 
+			String myCmd = "SELECT I_id, name, type FROM ingredients WHERE "+condition+";";
+			Ingredients listIng = new Ingredients();
+			PreparedStatement ps = con.prepareStatement(myCmd);
+			System.out.println(myCmd);
+			for(int i = 0; i<words.length;i++){
+				ps.setString(i+1,".*("+words[i]+").*");
+			}
+			ResultSet rs = ps.executeQuery();
+			while(rs.next()){
+				listIng.ingredientnames.add(rs.getString("name"));
+				listIng.ingredientIDs.add(rs.getInt("I_id"));
+				listIng.amounts.add("n/a");
+				listIng.types.add(rs.getString("type"));
+				listIng.freqs.add(1);
+				//(rs.getInt("I_id"), rs.getString("name"), rs.getString("amount"));
+			}
+			return listIng;
+		} catch (SQLException e){
+			System.out.println(e.getMessage());
+			return null;
+		}
+	}
+
+
 	/** Checks the database and updates the list of IDs already in the Database */
 	public void UpdateUsedIDs(){
 		try{
@@ -366,6 +421,23 @@ public class Librarian{
 		return true;
 	}
 
+	/**Function that stores the ingredient ID corresponding to a barcode
+	@param r is the recipe object to be stored in the database
+	@return a boolean representing whether or not the operation succeeded*/
+	public boolean stashBarcode(String code, String ingName){
+	if(!enableStashing) return false;
+	try{
+		PreparedStatement ps = con.prepareStatement("INSERT INTO barcode (code, I_id) VALUES (?,?)");
+		ps.setInt(1,getIngredientID(ingName));
+		ps.setString(2, code);
+		ps.executeUpdate();
+	} catch (SQLException e){
+		System.out.println("stashBarcode " + e.getMessage());
+		return false;
+	}
+	return true;
+	}
+
 	/** Helper function that makes sure all the
 	'default ingredients' (like 'add pepper to taste') are kept track of*/
 	public void updateDefaultIngredients(){
@@ -384,37 +456,5 @@ public class Librarian{
 			System.out.println(e.getMessage());
 		}
 		System.out.println(defaultIngredients);
-	}
-
-	/** A helper function that finds the ID of an ingredient with a known barcode
-	@param the barcode to search for
-	@return the appropriate Ingredient ID*/
-	public String getIngredientNameByBarcode(String code){
-		String myResult = "not found";
-		try{
-			String myCmd = "SELECT i.name FROM ingredients i, barcodes b WHERE i.I_id= AND code = ?;";
-			PreparedStatement ps1 = con.prepareStatement(myCmd);
-			ps1.setString(1, code);
-			ResultSet rs = ps1.executeQuery();
-			rs.next();
-			myResult = rs.getString("name");
-		} catch (SQLException e){
-			System.out.println("Ingredient not found");
-		}
-		return myResult;
-	}
-
-	public boolean stashBarcode(String code, String ingName){
-	if(!enableStashing) return false;
-	try{
-		PreparedStatement ps = con.prepareStatement("INSERT INTO barcode (code, I_id) VALUES (?,?)");
-		ps.setString(1,ingName);
-		ps.setString(2, code);
-		ps.executeUpdate();
-	} catch (SQLException e){
-		System.out.println("stashBarcode " + e.getMessage());
-		return false;
-	}
-	return true;
 	}
 }
