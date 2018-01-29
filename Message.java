@@ -125,6 +125,9 @@ public class Message {
 		}
 		else if (sInputBuff.regionMatches(0,"POST",0,4)){
 			type="POST";
+			if(sInputBuff.regionMatches(5,"/lookupproduct",0,14)){
+				requestedUrl = "/lookupproduct";
+			}
 			System.out.println("POST Receiver Received " + countOfBytes + " bytes.");
 			System.out.println("############# DEBUG ##########\n" + sInputBuff);
 			String tmp = sInputBuff.substring(getJSONContentFromByte(inputBuff), getEndOfJSONFromByte(inputBuff, getJSONContentFromByte(inputBuff)));
@@ -137,6 +140,9 @@ public class Message {
 				myIngredients = new Ingredients();
 				myIngredients.ingredientnames = gson.fromJson(requestContent.get("ingredients"), List.class);
 				System.out.println(myIngredients.ingredientnames.get(0));	
+			}
+			if(requestContent.get("type").getAsString().equals("lookupproduct")){
+				content = gson.fromJson(requestContent.get("lookupproduct"), String.class);
 			}
 		}
 		else{
@@ -294,17 +300,24 @@ public class Message {
 	 * Method that handles seding GET data as a response to the client
 	 * */
 	public void sendData(DataOutputStream str) throws IOException {
+		String header = "HTTP/1.1 200 OK\nX-Powered-By: Express\nContent-Type: application/json; charset=utf-8\nConnection: close\n\n";
 		if (type == "GET" && requestedUrl == null){
 			Gson gson = new GsonBuilder().setLenient().create();
-			content = gson.toJson("GetData={hello: yeah}");
-			str.writeBytes("HTTP/1.1 200 OK\nX-Powered-By: Express\nContent-Type: application/json; charset=utf-8\nConnection: close\n\n");
+			str.writeBytes(header);
 			str.writeBytes(gson.toJson(myRecipes));
 			str.flush();
 			str.close();
 		}
 		else if(type == "GET" && requestedUrl == "/getallingredients"){
 			Gson gson = new GsonBuilder().setLenient().create();
-			str.writeBytes("HTTP/1.1 200 OK\nX-Powered-By: Express\nContent-Type: application/json; charset=utf-8\nConnection: close\n\n");
+			str.writeBytes(header);
+			str.writeBytes(gson.toJson(myIngredients));
+			str.flush();
+			str.close();
+		}
+		else if(type == "POST" && requestedUrl == "/lookupproduct"){
+			Gson gson = new GsonBuilder().setLenient().create();
+			str.writeBytes(header);
 			str.writeBytes(gson.toJson(myIngredients));
 			str.flush();
 			str.close();
