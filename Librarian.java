@@ -385,4 +385,36 @@ public class Librarian{
 		}
 		System.out.println(defaultIngredients);
 	}
+
+	/** A helper function that finds the ID of an ingredient with a known barcode
+	@param the barcode to search for
+	@return the appropriate Ingredient ID*/
+	public String getIngredientNameByBarcode(String code){
+		String myResult = "not found";
+		try{
+			String myCmd = "SELECT i.name FROM ingredients i, barcodes b WHERE i.I_id= AND code = ?;";
+			PreparedStatement ps1 = con.prepareStatement(myCmd);
+			ps1.setString(1, code);
+			ResultSet rs = ps1.executeQuery();
+			rs.next();
+			myResult = rs.getString("name");
+		} catch (SQLException e){
+			System.out.println("Ingredient not found");
+		}
+		return myResult;
+	}
+
+	public boolean stashBarcode(String code, String ingName){
+	if(!enableStashing) return false;
+	try{
+		PreparedStatement ps = con.prepareStatement("INSERT INTO barcode (code, I_id) VALUES (?,?)");
+		ps.setString(1,ingName);
+		ps.setString(2, code);
+		ps.executeUpdate();
+	} catch (SQLException e){
+		System.out.println("stashBarcode " + e.getMessage());
+		return false;
+	}
+	return true;
+	}
 }
