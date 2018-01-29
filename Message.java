@@ -8,21 +8,37 @@ import java.util.*;
  *
  */
 public class Message {
-
+	/**
+	 * Delimeter for content of messages
+	 * */
 	public static final String TERMINATOR="\001";
-
+	/**
+	 * Maximum size of a message/request in bytes
+	 * */
 	public static final int MAXBUFF=1000;
-
+	/**
+ 	* Type of the message transimitted.GET,POST for REST server
+ 	* */
 	public String type;
-
+	/**
+	 * Content of a simple message.
+	 * */
 	public String content;
-
+	/**
+	 * Content of a HTTP request
+	 * */
 	public JsonObject requestContent;
-
+	/**
+	 * Ingriedents obtained from a request
+	 * */
 	public Ingredients myIngredients;
-
+	/**
+	 * Recipes from the database
+	 * */
 	public List<Recipe> myRecipes;
-	
+	/**
+	 * Parameter of the base URL requested by the user
+	 * */
 	public String requestedUrl;
 
 	/**
@@ -40,6 +56,12 @@ public class Message {
 		content = str2;
 	}
 
+	/**
+	* Constructor for basic field input
+	* @param str1 Type of the message, usually LINE but not used really
+	* @param str2 Content of the message
+	* @param url Requested parameter by the user
+	*/
 	public Message(String str1, String str2, String url) {
 		type = str1;
 		content = str2;
@@ -47,7 +69,7 @@ public class Message {
 	}
 
 	/**
-	* Constructor for Message class that takes an InputStream
+	* Constructor for Message class that takes an InputStream.Recognizes the type of the messsage.
 	* @param is InputStream to read from, input comes from Sender
 	* @throws EOFException In case it is the end of file
 	* @throws IOException In case of bad user input
@@ -160,6 +182,12 @@ public class Message {
 		}
 		return -1;
 	}
+	/**
+	* Helper method that finds where the JSON ends by finding the last occurence of }
+	* @param userB Byte array provided by the user
+	* @param jsonBegins Location where the JSON begins with {
+	* @return rVal The index of the last occurence of }
+	*/
 	public int getEndOfJSONFromByte(byte[] userB, int jsonBegins){
 		int rVal=-1;
 		for(int i=jsonBegins; i<userB.length; ++i){
@@ -170,6 +198,11 @@ public class Message {
 		++rVal;
 		return rVal;
 	}
+	/**
+	* Helper method that finds where the JSON begins.
+	* @param userB Byte array provided by the user
+	* @return i The position of the opening brace {
+	*/
 	public int getJSONContentFromByte(byte[] userB){
 		for(int i=0; i<userB.length; ++i){
 			if(userB[i] == 13 && userB[i-1] == 10 && userB[i+1] == 10){ //find where JSON begins after header
@@ -178,6 +211,11 @@ public class Message {
 		}
 		return -1;
 	}
+	/**
+	* Helper method that finds where the first comma in a byte array is
+	* @param userB Byte array provided by the user
+	* @return i The position of the first comma
+	*/
 	public int getCommaFromByte(byte[] userB){
 		for(int i=0; i<userB.length; ++i){
 			if(userB[i] == 44){
@@ -186,6 +224,11 @@ public class Message {
 		}
 		return -1;
 	}
+	/**
+	* Helper method that finds where the end of the byte input is
+	* @param userB Byte array provided by the user
+	* @return i The position of the end of the message
+	*/
 	public int getEndOfByte(byte[] userB){
 		for(int i=0; i<userB.length; ++i){
 			if(userB[i] == 0 && userB[i+1] == 0){ //if the next two positions in byte are 0 assume end of content
@@ -247,6 +290,9 @@ public class Message {
 		}
 	}
 	
+	/**
+	 * Method that handles seding GET data as a response to the client
+	 * */
 	public void sendData(DataOutputStream str) throws IOException {
 		if (type == "GET" && requestedUrl == null){
 			Gson gson = new GsonBuilder().setLenient().create();
