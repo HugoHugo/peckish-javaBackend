@@ -1,7 +1,5 @@
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Queue;
+import java.util.*;
+import java.util.regex.*;
 import java.lang.*;
 import java.io.*;
 
@@ -196,9 +194,17 @@ public class Spider {
 		    loscount = i;
 	    }
 	    if (loscount == 0) {
-		amount = ai.replaceAll("[^0-9]+"," ");
-		ingred = ai.substring(ai.indexOf(amount.charAt(amount.length()-1)) + 1, ai.length());
-	    }
+		Pattern pattern = Pattern.compile("(.)*(\\d)(.)*");
+		Matcher matcher = pattern.matcher(ai);
+		if (matcher.matches()) {
+			amount = ai.replaceAll("[^0-9]+","");
+			ingred = ai.substring(ai.indexOf(amount.charAt(amount.length()-1)) + 1, ai.length());
+		}
+		else {
+		    amount = "";
+		    ingred = ai;
+		}
+	    }	 
 	    else {
 		amount = ai.substring(0, ai.indexOf(los[loscount]) + los[loscount].length());
 		ingred = ai.substring(ai.indexOf(los[loscount]) + los[loscount].length(), ai.length());
@@ -206,14 +212,16 @@ public class Spider {
 	    if (ingred.indexOf(",") != -1) {
 		int start2 = ingred.indexOf(",");
 		int end2 = ingred.length();
-		amount = amount.concat(ingred.substring(start2,end2));
-		ingred = ingred.substring(0,start2);
+		String[] los2 = ingred.substring(start2,end2).split(" ");
+		if (los2.length < 3) {
+		    amount = amount.concat(ingred.substring(start2,end2));
+		    ingred = ingred.substring(0,start2);
+		}
 	    }
 	    amount = amount.trim();
 	    ingred = ingred.trim();
 	    yummy.ingredients.amounts.add(amount);
 	    yummy.ingredients.ingredientnames.add(ingred);
-	    System.out.println(amount + "\t" + "\t" + ingred);
 	    beginhere = end;
 	}
 	
@@ -226,10 +234,13 @@ public class Spider {
 	String ratingstring = html.substring(start,end);
 
 	keyphrase = ".";
-	start = ratingstring.indexOf(keyphrase);
-	start = start - 1;
-	end = start + 4;
-	yummy.rating = Double.parseDouble(ratingstring.substring(start,end));
+	if (ratingstring.indexOf(keyphrase) != -1) {	    
+	    start = 0;
+	    end = 4;
+	    yummy.rating = Double.parseDouble(ratingstring.substring(start,end));
+	}
+	else
+	    yummy.rating = Double.parseDouble(ratingstring);
 	
 	/* Adding to steps */
 	keyphrase = "<span class=\"recipe-directions__list--item\">";
