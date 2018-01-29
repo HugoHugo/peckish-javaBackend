@@ -25,6 +25,8 @@ public class Librarian{
 	/** A list version of the previous */
 	static private List<Integer> defIngList;
 
+	private int access = 0;
+
 	/** In case of parallelization*/
 	static private boolean stashing = false;
 	/** In case of parallelization*/
@@ -32,7 +34,8 @@ public class Librarian{
 
 	public static void main(String[] args){
 		ResourceBundle bundle = ResourceBundle.getBundle("javaconfig");
-		Librarian mylib = new Librarian(bundle);
+		Librarian mylib = new Librarian(bundle, 0);
+		Librarian mylib1 = new Librarian(bundle, 1);
 		//mylib.UpdateUsedIDs();
 		//mylib.updateDefaultIngredients();
 		List<String> ingList2 = new ArrayList<String>();
@@ -49,15 +52,21 @@ public class Librarian{
 		for(String s : is.ingredientnames){
 			System.out.println(s);
 		}
+		is = mylib.getAllIngredients();
+		System.out.println(is.ingredientnames.size());
+		mylib.getAllRecipes();
+		is = mylib1.getAllIngredients();
+		System.out.println(is.ingredientnames.size());
 		mylib.getAllRecipes();
 	}
 
 	/** Constructor that stores connection info and initializes the connection to the database */
-	public Librarian(ResourceBundle bundle){
+	public Librarian(ResourceBundle bundle, int initAccess){
 		user = bundle.getString("jdbc.user");
 		password = bundle.getString("jdbc.password");
 		url = bundle.getString("jdbc.url") + bundle.getString("jdbc.dbname");
 		driver = bundle.getString("jdbc.driver");
+		access = initAccess;
 		try{
 			Class.forName(driver);
 			con = DriverManager.getConnection(url, user, password);
@@ -89,7 +98,7 @@ public class Librarian{
 			for(int i=0;i<ingredientlist.ingredientIDs.size();i++){
 				myCommand = myCommand + "," + ingredientlist.ingredientIDs.get(i);
 			}
-			myCommand = myCommand + ") GROUP BY r.R_id) AS sub, recipes r WHERE sub.thing <= 15 AND r.R_id=sub.R_id ORDER BY missing;";
+			myCommand = myCommand + ") GROUP BY r.R_id) AS sub, recipes r WHERE sub.thing <= 15 AND r.R_id=sub.R_id AND r.access IN (0,"+access+") ORDER BY missing;";
 			//We ask for the recipes
 			ResultSet rs = st.executeQuery(myCommand);
 			//We make a list of the recipes to be returned
@@ -121,7 +130,7 @@ public class Librarian{
 	private Recipe getRecipe(int Rid){
 		Recipe tempr = new Recipe();
 		try{
-			String myCmd = "SELECT * FROM recipes WHERE R_id = ?;";
+			String myCmd = "SELECT * FROM recipes WHERE R_id = ? AND access IN (0,"+access+");";
 			PreparedStatement ps1 = con.prepareStatement(myCmd);
 			ps1.setInt(1, Rid);
 			ResultSet rs = ps1.executeQuery();
@@ -149,7 +158,7 @@ public class Librarian{
 		List<Recipe> res = null; new ArrayList<Recipe>();
 		try{
 			Statement st = con.createStatement();
-			ResultSet rs = st.executeQuery("SELECT * FROM recipes;");
+			ResultSet rs = st.executeQuery("SELECT * FROM recipes WHERE access IN (0,"+access+");");
 			res = new ArrayList<Recipe>();
 			Recipe tempr;
 			while(rs.next()){
@@ -178,7 +187,7 @@ public class Librarian{
 	private int getRecipeID(String title){
 		int myResult=-1;
 		try{
-			String myCmd = "SELECT R_id, rname FROM recipes WHERE rname = ?;";
+			String myCmd = "SELECT R_id, rname FROM recipes WHERE rname = ? AND access IN (0,"+access+");";
 			PreparedStatement ps1 = con.prepareStatement(myCmd);
 			ps1.setString(1, title);
 			ResultSet rs = ps1.executeQuery();
@@ -196,7 +205,7 @@ public class Librarian{
 	private int getIngredientID(String ingred){
 		int myResult = -1;
 		try{
-			String myCmd = "SELECT I_id, name FROM ingredients WHERE name = ?;";
+			String myCmd = "SELECT I_id, name FROM ingredients WHERE name = ? AND access IN (0,"+access+");";
 			PreparedStatement ps1 = con.prepareStatement(myCmd);
 			ps1.setString(1, ingred.toLowerCase());
 			ResultSet rs = ps1.executeQuery();
@@ -214,7 +223,7 @@ public class Librarian{
 	private String getIngredientName(int Iid){
 		String myResult=null;
 		try{
-			String myCmd = "SELECT I_id, name FROM ingredients WHERE I_id = ?;";
+			String myCmd = "SELECT I_id, name FROM ingredients WHERE I_id = ? AND access IN (0,"+access+");";
 			PreparedStatement ps1 = con.prepareStatement(myCmd);
 			ps1.setInt(1, Iid);
 			ResultSet rs = ps1.executeQuery();
@@ -226,23 +235,23 @@ public class Librarian{
 		return myResult;
 	}
 
-	/**API(if we will actually have some entries in the database) A helper function that finds the ID of an ingredient with a known barcode
-	@param the barcode to search for
-	@return the appropriate Ingredient ID*/
-	public String getIngredientNameByBarcode(String code){
-		String myResult = "not found";
-		try{
-			String myCmd = "SELECT i.name FROM ingredients i, barcodes b WHERE i.I_id= AND code = ?;";
-			PreparedStatement ps1 = con.prepareStatement(myCmd);
-			ps1.setString(1, code);
-			ResultSet rs = ps1.executeQuery();
-			rs.next();
-			myResult = rs.getString("name");
-		} catch (SQLException e){
-			System.out.println("Ingredient not found");
-		}
-		return myResult;
-	}
+//	/**API(if we will actually have some entries in the database) A helper function that finds the ID of an ingredient with a known barcode
+//	@param the barcode to search for
+//	@return the appropriate Ingredient ID*/
+//	public String getIngredientNameByBarcode(String code){
+//		String myResult = "not found";
+//		try{
+//			String myCmd = "SELECT i.name FROM ingredients i, barcodes b WHERE i.I_id= AND code = ?;";
+//			PreparedStatement ps1 = con.prepareStatement(myCmd);
+//			ps1.setString(1, code);
+//			ResultSet rs = ps1.executeQuery();
+//			rs.next();
+//			myResult = rs.getString("name");
+//		} catch (SQLException e){
+//			System.out.println("Ingredient not found");
+//		}
+//		return myResult;
+//	}
 
 	/** Helper function to match IDs to ingredient names  */
 	private void fillIID(Ingredients mylist){
@@ -269,7 +278,7 @@ public class Librarian{
 	@return Ingredients is the ingredients object of that recipe*/
 	private Ingredients getIngredientsinRecipe(int Rid){
 		try{
-			String myCmd = "SELECT i.I_id, i.name, ir.amount, i.type FROM ingredients i, IinR ir WHERE ir.R_id = ? AND i.I_id = ir.I_id;";
+			String myCmd = "SELECT i.I_id, i.name, ir.amount, i.type FROM ingredients i, IinR ir, recipes r WHERE r.R_id = ir.R_id AND ir.R_id = ? AND r.access IN (0,"+access+") AND i.I_id = ir.I_id;";
 			Ingredients listIng = new Ingredients();
 			PreparedStatement ps = con.prepareStatement(myCmd);
 			ps.setInt(1, Rid);
@@ -293,7 +302,7 @@ public class Librarian{
 	@return Ingredients is the ingredients object of that recipe*/
 	public Ingredients getAllIngredients(){
 		try{
-			String myCmd = "SELECT i.I_id, i.name, i.type, COUNT(*) AS freq FROM ingredients i, iinr ir WHERE i.I_id= ir.I_id GROUP BY i.I_id, i.name, i.type ORDER BY freq DESC;";
+			String myCmd = "SELECT i.I_id, i.name, i.type, COUNT(*) AS freq FROM ingredients i, iinr ir WHERE i.I_id= ir.I_id AND i.access IN (0,"+access+") GROUP BY i.I_id, i.name, i.type, i.access ORDER BY freq DESC;";
 			Ingredients listIng = new Ingredients();
 			PreparedStatement ps = con.prepareStatement(myCmd);
 			ResultSet rs = ps.executeQuery();
@@ -324,7 +333,7 @@ public class Librarian{
 			for(int i=1; i < words.length; i++){
 				condition = condition + " OR name ~* ?";
 			} 
-			String myCmd = "SELECT I_id, name, type FROM ingredients WHERE "+condition+";";
+			String myCmd = "SELECT I_id, name, type FROM ingredients WHERE "+condition+" AND access IN (0,"+access+");";
 			Ingredients listIng = new Ingredients();
 			PreparedStatement ps = con.prepareStatement(myCmd);
 			System.out.println(myCmd);
@@ -391,7 +400,7 @@ public class Librarian{
 		if(!enableStashing) return false;
 		stashIngredients(r.ingredients);
 		try{
-			PreparedStatement ps = con.prepareStatement("INSERT INTO recipes (R_id, rname, url, imageURL, numIngredients, steps, rating, cooktime, serving, source) VALUES (?,?,?,?,?,?,?,?,?,?)");
+			PreparedStatement ps = con.prepareStatement("INSERT INTO recipes (R_id, rname, url, imageURL, numIngredients, steps, rating, cooktime, serving, source, access) VALUES (?,?,?,?,?,?,?,?,?,?,?)");
 			if(getRecipeID(r.rname)==-1){
 				int temp = getUnusedRID();
 				System.out.println(temp);
@@ -405,6 +414,7 @@ public class Librarian{
 				ps.setString(8,r.cooktime);
 				ps.setString(9,r.serving);
 				ps.setString(10,r.source);
+				ps.setInt(11,access);
 				ps.executeUpdate();
 				usedRIDs.add(temp);
 				ps = con.prepareStatement("INSERT INTO IinR (R_id, I_id, amount) VALUES (?,?,?)");
@@ -435,7 +445,7 @@ public class Librarian{
 		System.out.println("boop");
 		fillIID(ings);
 		try{
-			PreparedStatement ps = con.prepareStatement("INSERT INTO ingredients (I_id, name, type) VALUES (?,?,?)");
+			PreparedStatement ps = con.prepareStatement("INSERT INTO ingredients (I_id, name, type, access) VALUES (?,?,?,?)");
 			for(int i = 0; i<ings.ingredientIDs.size(); i++){
 				if(ings.ingredientIDs.get(i) == -1){
 					int temp = getUnusedIID();
@@ -443,6 +453,7 @@ public class Librarian{
 					ps.setInt(1, temp);
 					ps.setString(2,ings.ingredientnames.get(i).toLowerCase());
 					ps.setString(3, "non-poisonous");
+					ps.setInt(4, access);
 					ps.executeUpdate();
 					usedIIDs.add(temp);
 				}
@@ -455,22 +466,22 @@ public class Librarian{
 		return true;
 	}
 
-	/**Function that stores the ingredient ID corresponding to a barcode
-	@param r is the recipe object to be stored in the database
-	@return a boolean representing whether or not the operation succeeded*/
-	public boolean stashBarcode(String code, String ingName){
-	if(!enableStashing) return false;
-	try{
-		PreparedStatement ps = con.prepareStatement("INSERT INTO barcode (code, I_id) VALUES (?,?)");
-		ps.setInt(1,getIngredientID(ingName));
-		ps.setString(2, code);
-		ps.executeUpdate();
-	} catch (SQLException e){
-		System.out.println("stashBarcode " + e.getMessage());
-		return false;
-	}
-	return true;
-	}
+//	/**Function that stores the ingredient ID corresponding to a barcode
+//	@param r is the recipe object to be stored in the database
+//	@return a boolean representing whether or not the operation succeeded*/
+//	public boolean stashBarcode(String code, String ingName){
+//	if(!enableStashing) return false;
+//	try{
+//		PreparedStatement ps = con.prepareStatement("INSERT INTO barcode (code, I_id) VALUES (?,?)");
+//		ps.setInt(1,getIngredientID(ingName));
+//		ps.setString(2, code);
+//		ps.executeUpdate();
+//	} catch (SQLException e){
+//		System.out.println("stashBarcode " + e.getMessage());
+//		return false;
+//	}
+//	return true;
+//	}
 
 	/** Helper function that makes sure all the
 	'default ingredients' (like 'add pepper to taste') are kept track of*/

@@ -23,7 +23,7 @@ public class RunSpider {
     spider.crawl(BEGINNING_URL);
     List<Recipe> recipelist = spider.recipelist;
     ResourceBundle bundle = ResourceBundle.getBundle("javaconfig");
-    Librarian mylib = new Librarian(bundle);
+    Librarian mylib = new Librarian(bundle, 0);
     for(Recipe r : recipelist){
       mylib.stashRecipe(r);
     }
