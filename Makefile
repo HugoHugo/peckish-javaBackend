@@ -18,4 +18,4 @@ javadoc-local:
 	cd doc; javadoc -author -package *.java
 
 setup:
-	wget http://repo1.maven.org/maven2/com/squareup/okhttp3/okhttp/3.9.1/okhttp-3.9.1.jar
+	wget http://repo1.maven.org/maven2/com/google/code/gson/gson/2.8.2/gson-2.8.2.jar 

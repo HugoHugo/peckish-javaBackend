@@ -29,7 +29,8 @@ public class RunSpider {
       ResourceBundle bundle = ResourceBundle.getBundle("javaconfig");
       Librarian mylib = new Librarian(bundle);
       for(Recipe r : recipelist){
-	  mylib.stashRecipe(r);
+	      mylib.stashRecipe(r);
       }
+      mylib.updateDefaultIngredients();
   }
 }

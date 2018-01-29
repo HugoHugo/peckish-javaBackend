@@ -22,6 +22,8 @@ public class Message {
 	public Ingredients myIngredients;
 
 	public List<Recipe> myRecipes;
+	
+	public String requestedUrl;
 
 	/**
 	* Default constructor for Message class
@@ -36,6 +38,12 @@ public class Message {
 	public Message(String str1, String str2) {
 		type = str1;
 		content = str2;
+	}
+
+	public Message(String str1, String str2, String url) {
+		type = str1;
+		content = str2;
+		requestedUrl = url;
 	}
 
 	/**
@@ -82,6 +90,9 @@ public class Message {
 			}
 		}
 		else if (sInputBuff.regionMatches(0,"GET",0,3)){
+			if(sInputBuff.regionMatches(4,"/getallingredients",0,18)){
+				requestedUrl = "/getallingredients";
+			}
 			type="GET";
 			System.out.println("GET Receiver Received " + countOfBytes + " bytes.");
 			content = toString(inputBuff);
@@ -93,6 +104,7 @@ public class Message {
 		else if (sInputBuff.regionMatches(0,"POST",0,4)){
 			type="POST";
 			System.out.println("POST Receiver Received " + countOfBytes + " bytes.");
+			System.out.println("############# DEBUG ##########\n" + sInputBuff);
 			String tmp = sInputBuff.substring(getJSONContentFromByte(inputBuff), getEndOfJSONFromByte(inputBuff, getJSONContentFromByte(inputBuff)));
 			System.out.println(tmp);
 			content = tmp;
@@ -236,14 +248,18 @@ public class Message {
 	}
 	
 	public void sendData(DataOutputStream str) throws IOException {
-		if (type == "GET"){
+		if (type == "GET" && requestedUrl == null){
 			Gson gson = new GsonBuilder().setLenient().create();
 			content = gson.toJson("GetData={hello: yeah}");
-			//byte [] bcon = getBytes(content);
-			//int bconSize = bcon.length;
-			//Ingredient testIn = new Ingredient(2,"pasta");
 			str.writeBytes("HTTP/1.1 200 OK\nX-Powered-By: Express\nContent-Type: application/json; charset=utf-8\nConnection: close\n\n");
 			str.writeBytes(gson.toJson(myRecipes));
+			str.flush();
+			str.close();
+		}
+		else if(type == "GET" && requestedUrl == "/getallingredients"){
+			Gson gson = new GsonBuilder().setLenient().create();
+			str.writeBytes("HTTP/1.1 200 OK\nX-Powered-By: Express\nContent-Type: application/json; charset=utf-8\nConnection: close\n\n");
+			str.writeBytes(gson.toJson(myIngredients));
 			str.flush();
 			str.close();
 		}
