@@ -55,7 +55,7 @@ public class initDatabase{
 		myR.url = "https://www.budgetbytes.com/2017/04/will-skillet-mac-cheese/";
 		myR.serving = "2";
 		myR.cooktime = "20 m";
-		myR.imageURL = "https://www.budgetbytes.com/wp-content/uploads/2017/04/Will-It-Skillet-Mac-and-Cheese-close.jpg";
+		myR.imageurl = "https://www.budgetbytes.com/wp-content/uploads/2017/04/Will-It-Skillet-Mac-and-Cheese-close.jpg";
 		mylib.stashRecipe(myR);
 		System.out.println("Done. (Theoretically)");
 	}
