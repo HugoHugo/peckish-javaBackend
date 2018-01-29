@@ -20,7 +20,11 @@ public class initDatabase{
 		}catch(SQLException e){System.out.println(e.getMessage());}
 		try{
 			Statement st = mylib.con.createStatement();
-			st.executeUpdate("GRANT ALL PRIVILEGES ON ingredients, recipes, IinR TO irelan1,valent1,radueg1,belezn1;");
+			st.executeUpdate("CREATE TABLE barcodes(code text primary key,I_id references ingredients(I_id)");
+		}catch(SQLException e){System.out.println(e.getMessage());}
+		try{
+			Statement st = mylib.con.createStatement();
+			st.executeUpdate("GRANT ALL PRIVILEGES ON ingredients, recipes, IinR, barcodes TO irelan1,valent1,radueg1,belezn1;");
 		}catch(SQLException e){System.out.println(e.getMessage());}
 
 
