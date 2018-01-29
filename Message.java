@@ -125,6 +125,7 @@ public class Message {
 		}
 		else if (sInputBuff.regionMatches(0,"POST",0,4)){
 			type="POST";
+			requestedUrl="";
 			if(sInputBuff.regionMatches(5,"/lookupproduct",0,14)){
 				requestedUrl = "/lookupproduct";
 			}
