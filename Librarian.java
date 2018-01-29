@@ -230,7 +230,7 @@ public class Librarian{
 	@param the barcode to search for
 	@return the appropriate Ingredient ID*/
 	public String getIngredientNameByBarcode(String code){
-		String myResult = "not found";
+		String myResult = "matchingingredientsnotfound";
 		try{
 			String myCmd = "SELECT i.name FROM ingredients i, barcodes b WHERE i.I_id= AND code = ?;";
 			PreparedStatement ps1 = con.prepareStatement(myCmd);
