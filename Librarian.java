@@ -98,7 +98,7 @@ public class Librarian{
 			for(int i=0;i<ingredientlist.ingredientIDs.size();i++){
 				myCommand = myCommand + "," + ingredientlist.ingredientIDs.get(i);
 			}
-			myCommand = myCommand + ") GROUP BY r.R_id) AS sub, recipes r WHERE sub.thing <= 15 AND r.R_id=sub.R_id AND r.access IN (0,"+access+") ORDER BY missing;";
+			myCommand = myCommand + ") GROUP BY r.R_id) AS sub, recipes r WHERE sub.thing <= 7 AND r.R_id=sub.R_id AND r.access IN (0,"+access+") ORDER BY missing;";
 			//We ask for the recipes
 			ResultSet rs = st.executeQuery(myCommand);
 			//We make a list of the recipes to be returned
@@ -488,7 +488,7 @@ public class Librarian{
 	'default ingredients' (like 'add pepper to taste') are kept track of*/
 	public void updateDefaultIngredients(){
 		try{
-			String myCmd = "SELECT I_id FROM ingredients WHERE name ~* '.*(salt ).*' OR name ~* '.*(black pepper).*' OR (name ~* '.*(pepper).*' AND name ~* '.*(to taste).*');";
+			String myCmd = "SELECT I_id FROM ingredients WHERE name ~* '.*(water).*' OR '.*(salt ).*' OR name ~* '.*(black pepper).*' OR (name ~* '.*(pepper).*' AND name ~* '.*(to taste).*');";
 			Statement st = con.createStatement();
 			ResultSet rs = st.executeQuery(myCmd);
 			defaultIngredients = "(0,1,2";
