@@ -14,6 +14,11 @@ CREATE TABLE recipes(
 	imageURL text DEFAULT 'https://cdn.pixabay.com/photo/2013/11/24/10/40/dessert-216870_960_720.jpg'
 );
 
+CREATE TABLE barcodes(
+	code text primary key,
+	I_id references ingredients(I_id)
+);
+
 CREATE TABLE ingredients(
 	I_id int primary key,
 	name text UNIQUE,
