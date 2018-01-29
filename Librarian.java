@@ -49,6 +49,7 @@ public class Librarian{
 		for(String s : is.ingredientnames){
 			System.out.println(s);
 		}
+		mylib.getAllRecipes();
 	}
 
 	/** Constructor that stores connection info and initializes the connection to the database */
@@ -74,7 +75,7 @@ public class Librarian{
 		}
 	}
 
-	/** method that searches for recipes that can be made with the given ingredients
+	/**API method that searches for recipes that can be made with the given ingredients
 	@param ingredientlist is an array of ints that represents the IDs of the ingredients
 	@return A list of recipes that have at most 4 ingredients missing, with the number of ingredients missing*/
 	public List<Recipe> searchPotentialRecipes(Ingredients ingredientlist){
@@ -117,7 +118,7 @@ public class Librarian{
 	/** Searches the database for the recipe corresponding to the ID, and returns it
 	@param Rid the ID of the recipe in question
 	@return the appropriate Recipe object*/
-	public Recipe getRecipe(int Rid){
+	private Recipe getRecipe(int Rid){
 		Recipe tempr = new Recipe();
 		try{
 			String myCmd = "SELECT * FROM recipes WHERE R_id = ?;";
@@ -141,10 +142,40 @@ public class Librarian{
 		return tempr;
 	}
 
+	/**API Searches the database for the recipe corresponding to the ID, and returns it
+	@param Rid the ID of the recipe in question
+	@return the appropriate Recipe object*/
+	public List<Recipe> getAllRecipes(){
+		List<Recipe> res = null; new ArrayList<Recipe>();
+		try{
+			Statement st = con.createStatement();
+			ResultSet rs = st.executeQuery("SELECT * FROM recipes;");
+			res = new ArrayList<Recipe>();
+			Recipe tempr;
+			while(rs.next()){
+				tempr = new Recipe();
+				tempr.rid = rs.getInt("R_id");
+				tempr.ingredients =getIngredientsinRecipe(rs.getInt("R_id"));
+				tempr.rating = rs.getDouble("rating");
+				tempr.steps = rs.getString("steps");
+				tempr.rname = rs.getString("rname");
+				tempr.imageurl = rs.getString("imageURL");
+				tempr.url = rs.getString("url");
+				tempr.cooktime = rs.getString("cooktime");
+				tempr.serving = rs.getString("serving");
+				tempr.source = rs.getString("source");
+				res.add(tempr);
+			}
+		} catch (SQLException e){
+			System.out.println(e.getMessage());
+		}
+		return res;
+	}
+
 	/** A helper function that finds the ID of a recipe
 	@param title the exact name of the recipe in question
 	@return Rid*/
-	public int getRecipeID(String title){
+	private int getRecipeID(String title){
 		int myResult=-1;
 		try{
 			String myCmd = "SELECT R_id, rname FROM recipes WHERE rname = ?;";
@@ -162,7 +193,7 @@ public class Librarian{
 	/** A helper function that finds the ID of an ingredient
 	@param ingred the exact name of the ingredient in question
 	@return the appropriate Ingredient ID*/
-	public int getIngredientID(String ingred){
+	private int getIngredientID(String ingred){
 		int myResult = -1;
 		try{
 			String myCmd = "SELECT I_id, name FROM ingredients WHERE name = ?;";
@@ -180,7 +211,7 @@ public class Librarian{
 	/** A helper function that finds the ID of an ingredient
 	@param Iid the ID of the ingredient in question
 	@return the appropriate Ingredient name*/
-	public String getIngredientName(int Iid){
+	private String getIngredientName(int Iid){
 		String myResult=null;
 		try{
 			String myCmd = "SELECT I_id, name FROM ingredients WHERE I_id = ?;";
@@ -195,7 +226,7 @@ public class Librarian{
 		return myResult;
 	}
 
-	/** A helper function that finds the ID of an ingredient with a known barcode
+	/**API(if we will actually have some entries in the database) A helper function that finds the ID of an ingredient with a known barcode
 	@param the barcode to search for
 	@return the appropriate Ingredient ID*/
 	public String getIngredientNameByBarcode(String code){
@@ -214,7 +245,7 @@ public class Librarian{
 	}
 
 	/** Helper function to match IDs to ingredient names  */
-	public void fillIID(Ingredients mylist){
+	private void fillIID(Ingredients mylist){
 		mylist.ingredientIDs = null;
 		mylist.ingredientIDs = new ArrayList<Integer>();
 		for(String name : mylist.ingredientnames){
@@ -225,7 +256,7 @@ public class Librarian{
 	}
 
 	/** Helper function to match ingredient names to IDs  */
-	public void fillIname(Ingredients mylist){
+	private void fillIname(Ingredients mylist){
 		mylist.ingredientnames = null;
 		mylist.ingredientnames = new ArrayList<String>();
 		for(Integer ID : mylist.ingredientIDs){
@@ -236,7 +267,7 @@ public class Librarian{
 	/** This function returns an ingredients object containing the ingredients of a recipe identified by Rid
 	@param Rid is the ID of the recipe in question
 	@return Ingredients is the ingredients object of that recipe*/
-	public Ingredients getIngredientsinRecipe(int Rid){
+	private Ingredients getIngredientsinRecipe(int Rid){
 		try{
 			String myCmd = "SELECT i.I_id, i.name, ir.amount, i.type FROM ingredients i, IinR ir WHERE ir.R_id = ? AND i.I_id = ir.I_id;";
 			Ingredients listIng = new Ingredients();
@@ -258,7 +289,7 @@ public class Librarian{
 		}
 	}
 
-	/** This function returns an ingredients object containing all ingredients currently in the database
+	/**API This function returns an ingredients object containing all ingredients currently in the database
 	@return Ingredients is the ingredients object of that recipe*/
 	public Ingredients getAllIngredients(){
 		try{
@@ -282,7 +313,7 @@ public class Librarian{
 		}
 	}
 
-	/** A function that searches the list of ingredients that have any of the search words in its name
+	/**API A function that searches the list of ingredients that have any of the search words in its name
 	@param Search string
 	@return Ingredients matching the search*/
 	public Ingredients searchIngredients(String search){
@@ -318,7 +349,7 @@ public class Librarian{
 
 
 	/** Checks the database and updates the list of IDs already in the Database */
-	public void UpdateUsedIDs(){
+	private void UpdateUsedIDs(){
 		try{
 			Statement st = con.createStatement();
 			ResultSet rs = st.executeQuery("SELECT I_id FROM ingredients;");
