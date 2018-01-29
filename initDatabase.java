@@ -5,14 +5,14 @@ import java.sql.*;
 public class initDatabase{
 	public static void main(String[] args){
 		ResourceBundle bundle = ResourceBundle.getBundle("javaconfig");
-		Librarian mylib = new Librarian(bundle);
+		Librarian mylib = new Librarian(bundle,0);
 		try{
 			Statement st = mylib.con.createStatement();
-			st.executeUpdate("CREATE TABLE ingredients(I_id int primary key, name text UNIQUE, type text);");
+			st.executeUpdate("CREATE TABLE ingredients(I_id int primary key, access int, name text, type text, unique(access, name));");
 		}catch(SQLException e){System.out.println(e.getMessage());}
 		try{
 			Statement st = mylib.con.createStatement();
-			st.executeUpdate("CREATE TABLE recipes(R_id int primary key,rname text,steps text,numIngredients int,rating double precision,cooktime text,serving text,url text DEFAULT 'https://wp.stolaf.edu/',imageURL text DEFAULT 'https://cdn.pixabay.com/photo/2013/11/24/10/40/dessert-216870_960_720.jpg',source text);");
+			st.executeUpdate("CREATE TABLE recipes(R_id int primary key,access int,rname text,steps text,numIngredients int,rating double precision,cooktime text,serving text,url text DEFAULT 'https://wp.stolaf.edu/',imageURL text DEFAULT 'https://cdn.pixabay.com/photo/2013/11/24/10/40/dessert-216870_960_720.jpg',source text);");
 		}catch(SQLException e){System.out.println(e.getMessage());}
 		try{
 			Statement st = mylib.con.createStatement();
@@ -20,11 +20,15 @@ public class initDatabase{
 		}catch(SQLException e){System.out.println(e.getMessage());}
 		try{
 			Statement st = mylib.con.createStatement();
-			st.executeUpdate("CREATE TABLE barcodes(code text primary key,I_id references ingredients(I_id)");
+			st.executeUpdate("CREATE TABLE users(U_id int, name text, mysteries text);");
 		}catch(SQLException e){System.out.println(e.getMessage());}
+//		try{
+//			Statement st = mylib.con.createStatement();
+//			st.executeUpdate("CREATE TABLE barcodes(code text primary key,I_id references ingredients(I_id)");
+//		}catch(SQLException e){System.out.println(e.getMessage());}
 		try{
 			Statement st = mylib.con.createStatement();
-			st.executeUpdate("GRANT ALL PRIVILEGES ON ingredients, recipes, IinR, barcodes TO irelan1,valent1,radueg1,belezn1;");
+			st.executeUpdate("GRANT ALL PRIVILEGES ON ingredients, recipes, IinR, users TO irelan1,valent1,radueg1,belezn1;");
 		}catch(SQLException e){System.out.println(e.getMessage());}
 
 
