@@ -12,7 +12,7 @@ public class initDatabase{
 		}catch(SQLException e){System.out.println(e.getMessage());}
 		try{
 			Statement st = mylib.con.createStatement();
-			st.executeUpdate("CREATE TABLE recipes(R_id int primary key,rname text,steps text,numIngredients int,rating double precision,cooktime text,serving text,url text DEFAULT 'https://wp.stolaf.edu/',imageURL text DEFAULT 'https://cdn.pixabay.com/photo/2013/11/24/10/40/dessert-216870_960_720.jpg',source text DEFAULT 'AllRecipes.com');");
+			st.executeUpdate("CREATE TABLE recipes(R_id int primary key,rname text,steps text,numIngredients int,rating double precision,cooktime text,serving text,url text DEFAULT 'https://wp.stolaf.edu/',imageURL text DEFAULT 'https://cdn.pixabay.com/photo/2013/11/24/10/40/dessert-216870_960_720.jpg',source text);");
 		}catch(SQLException e){System.out.println(e.getMessage());}
 		try{
 			Statement st = mylib.con.createStatement();
