@@ -76,7 +76,7 @@ public class Worker implements Runnable {
 		}
 		if(m.requestedUrl == "/lookupproduct"){
 			m3.requestedUrl = m.requestedUrl;
-			m3.type = "POST";
+			m3.type = "GET";
 			m3.myIngredients = mylib.searchIngredients(m.content);
 			m3.sendData(outStream);
 		}
