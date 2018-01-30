@@ -115,6 +115,9 @@ public class Message {
 			if(sInputBuff.regionMatches(4,"/getallingredients",0,18)){
 				requestedUrl = "/getallingredients";
 			}
+			else if(sInputBuff.regionMatches(4,"/getallrecipes",0,14)){
+				requestedUrl = "/getallrecipes";
+			}
 			type="GET";
 			System.out.println("GET Receiver Received " + countOfBytes + " bytes.");
 			content = toString(inputBuff);
@@ -320,6 +323,13 @@ public class Message {
 			Gson gson = new GsonBuilder().setLenient().create();
 			str.writeBytes(header);
 			str.writeBytes(gson.toJson(myIngredients));
+			str.flush();
+			str.close();
+		}
+		else if(type == "GET" && requestedUrl == "/getallrecipes"){
+			Gson gson = new GsonBuilder().setLenient().create();
+			str.writeBytes(header);
+			str.writeBytes(gson.toJson(myRecipes));
 			str.flush();
 			str.close();
 		}
