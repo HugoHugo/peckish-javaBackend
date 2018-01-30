@@ -21,9 +21,9 @@ public class Librarian{
 	static private List<Integer> usedRIDs = new ArrayList<Integer>();
 	/** A String containing the beginning of a list of the I_ids of the default ingredients
 	It contains water, salt, pepper by default */
-	static private String defaultIngredients = "(0,1,2";
+	private String defaultIngredients = "(0,1,2";
 	/** A list version of the previous */
-	static private List<Integer> defIngList;
+	private List<Integer> defIngList;
 
 	private int access = 0;
 
@@ -75,6 +75,7 @@ public class Librarian{
 			System.out.println("Connected with no exceptions");
 			UpdateUsedIDs();
 			updateDefaultIngredients();
+			System.out.println("Updating default ingredients");
 		} catch (ClassNotFoundException e){
 			System.out.println("Error Connecting to Database:");
 			System.out.println(e.getMessage());
@@ -488,7 +489,7 @@ public class Librarian{
 	'default ingredients' (like 'add pepper to taste') are kept track of*/
 	public void updateDefaultIngredients(){
 		try{
-			String myCmd = "SELECT I_id FROM ingredients WHERE name ~* '.*(water).*' OR '.*(salt ).*' OR name ~* '.*(black pepper).*' OR (name ~* '.*(pepper).*' AND name ~* '.*(to taste).*');";
+			String myCmd = "SELECT I_id FROM ingredients WHERE name ~* '.*(water).*' OR name ~* '.*(salt ).*' OR name ~* '.*(black pepper).*' OR (name ~* '.*(pepper).*' AND name ~* '.*(to taste).*');";
 			Statement st = con.createStatement();
 			ResultSet rs = st.executeQuery(myCmd);
 			defaultIngredients = "(0,1,2";
