@@ -15,7 +15,7 @@ public class Message {
 	/**
 	 * Maximum size of a message/request in bytes
 	 * */
-	public static final int MAXBUFF=1000000000;
+	public static final int MAXBUFF=1000000;
 	/**
  	* Type of the message transimitted.GET,POST for REST server
  	* */
