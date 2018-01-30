@@ -12,7 +12,7 @@ public class Worker implements Runnable {
   public Worker (Socket s){
     sock = s;
     ResourceBundle bundle = ResourceBundle.getBundle("javaconfig");
-    mylib = new Librarian(bundle);
+    mylib = new Librarian(bundle, 0);
   }
   /**
   * Method to run this thread of the worker. Reads in from the InputStream
