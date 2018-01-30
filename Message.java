@@ -316,7 +316,7 @@ public class Message {
 			str.flush();
 			str.close();
 		}
-		else if(type == "POST" && requestedUrl == "/lookupproduct"){
+		else if(type == "GET" && requestedUrl == "/lookupproduct"){
 			Gson gson = new GsonBuilder().setLenient().create();
 			str.writeBytes(header);
 			str.writeBytes(gson.toJson(myIngredients));
