@@ -488,7 +488,7 @@ public class Librarian{
 	'default ingredients' (like 'add pepper to taste') are kept track of*/
 	public void updateDefaultIngredients(){
 		try{
-			String myCmd = "SELECT I_id FROM ingredients WHERE name ~* '.*(water).*' OR '.*(salt ).*' OR name ~* '.*(black pepper).*' OR (name ~* '.*(pepper).*' AND name ~* '.*(to taste).*');";
+			String myCmd = "SELECT I_id FROM ingredients WHERE name ~* '.*(water).*' OR name ~* '.*(salt ).*' OR name ~* '.*(black pepper).*' OR (name ~* '.*(pepper).*' AND name ~* '.*(to taste).*');";
 			Statement st = con.createStatement();
 			ResultSet rs = st.executeQuery(myCmd);
 			defaultIngredients = "(0,1,2";

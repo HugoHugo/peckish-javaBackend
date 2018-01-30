@@ -74,10 +74,15 @@ public class Worker implements Runnable {
 			m3.myIngredients=mylib.getAllIngredients();
 			m3.sendData(outStream);
 		}
-		if(m.requestedUrl == "/lookupproduct"){
+		else if(m.requestedUrl == "/lookupproduct"){
 			m3.requestedUrl = m.requestedUrl;
 			m3.type = "GET";
 			m3.myIngredients = mylib.searchIngredients(m.content);
+			m3.sendData(outStream);
+		}
+		else if(m.requestedUrl == "/getallrecipes"){
+			m3.requestedUrl = m.requestedUrl;
+			m3.myRecipes = mylib.getAllRecipes();
 			m3.sendData(outStream);
 		}
 		else {
