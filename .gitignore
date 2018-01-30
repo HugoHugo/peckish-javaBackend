@@ -1,0 +1,9 @@
+*.class*
+.project*
+*/doc/*
+doc
+*.settings*
+node_modules/*
+.pgpass
+javaconfig.properties
+myexport.sh
